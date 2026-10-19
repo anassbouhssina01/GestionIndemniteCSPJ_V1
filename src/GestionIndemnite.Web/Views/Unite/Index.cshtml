@@ -1,0 +1,94 @@
+@model IReadOnlyList<GestionIndemnite.Application.RHOrganisation.DTOs.UniteOrganisationnelleDto>
+@{
+    ViewData["Title"] = "Unités organisationnelles";
+    var inactifs = (bool)(ViewData["Inactifs"] ?? false);
+    var villes = (Dictionary<Guid, string>)ViewBag.Villes;
+    var typesFr = (Dictionary<GestionIndemnite.Domain.RHOrganisation.Enums.TypeUnite, string>)ViewBag.TypesFr;
+    var parents = (Dictionary<Guid, string?>)ViewBag.Parents;
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">UNITÉS ORGANISATIONNELLES</h2>
+        <p class="page-description">Unités organisationnelles et leur rattachement hiérarchique.</p>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-primary" asp-action="Create">Nouvelle unité</a>
+    </div>
+</div>
+
+<form method="get" class="filter-toolbar">
+    <div class="filter-group">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="inactifs" value="true" id="inactifs" @(inactifs ? "checked" : "") onchange="this.form.submit()" />
+            <label class="form-check-label" for="inactifs">Afficher les inactives</label>
+        </div>
+    </div>
+</form>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Nom (arabe)</th>
+                    <th>Type</th>
+                    <th>Ville</th>
+                    <th>Parent actuel</th>
+                    <th>État</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="7" class="text-center text-muted">Aucune unité organisationnelle.</td></tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.NomUnite</td>
+                        <td dir="rtl">@(string.IsNullOrWhiteSpace(item.NomUniteAr) ? "—" : item.NomUniteAr)</td>
+                        <td><span class="badge-type-tribunal">@typesFr[item.TypeUnite]</span></td>
+                        <td>@(villes.TryGetValue(item.IdVille, out var nomVille) ? nomVille : item.IdVille.ToString())</td>
+                        <td>
+                            @if (parents.TryGetValue(item.Id, out var nomParent) && nomParent is not null)
+                            {
+                                <span class="badge-parent-tribunal">@nomParent</span>
+                            }
+                            else
+                            {
+                                @:—
+                            }
+                        </td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="badge-statut-pill green">Actif</span>
+                            }
+                            else
+                            {
+                                <span class="badge-statut-pill gray">Inactif</span>
+                            }
+                        </td>
+                        <td class="text-right">
+                            @if (item.IsActive)
+                            {
+                                <form method="post" asp-action="Disable" asp-route-id="@item.Id">
+                                    <button type="submit" class="btn-table-action danger">Désactiver</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-action="Enable" asp-route-id="@item.Id">
+                                    <button type="submit" class="btn-table-action">Activer</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

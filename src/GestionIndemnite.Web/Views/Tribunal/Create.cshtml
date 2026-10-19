@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Nouveau tribunal";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">NOUVEAU TRIBUNAL</h2>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" class="panel-card form-panel">
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label class="form-label" for="NomTribunal">Nom du tribunal (français)</label>
+            <input class="form-input" id="NomTribunal" name="NomTribunal" maxlength="200" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="NomTribunalAr">Nom du tribunal (arabe)</label>
+            <input class="form-input arabic-font" id="NomTribunalAr" name="NomTribunalAr" maxlength="200" dir="rtl" />
+        </div>
+    </div>
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label class="form-label" for="TypeTribunal">Type</label>
+            <select class="form-select" id="TypeTribunal" name="TypeTribunal" asp-items="ViewBag.Types" required>
+                <option value="">— Sélectionner —</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="NiveauJuridiction">Niveau de juridiction</label>
+            <select class="form-select" id="NiveauJuridiction" name="NiveauJuridiction" asp-items="ViewBag.Niveaux" required>
+                <option value="">— Sélectionner —</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="IdVille">Ville</label>
+        <select class="form-select" id="IdVille" name="IdVille" asp-items="ViewBag.Villes" required>
+            <option value="">— Sélectionner —</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="IdTribunalParent">Tribunal parent (facultatif)</label>
+        <select class="form-select" id="IdTribunalParent" name="IdTribunalParent" asp-items="ViewBag.Parents">
+            <option value="">Aucun (niveau supérieur)</option>
+        </select>
+    </div>
+    <div class="page-actions-group mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>

@@ -1,0 +1,47 @@
+@{
+    ViewData["Title"] = "Nouvelle unité organisationnelle";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">NOUVELLE UNITÉ ORGANISATIONNELLE</h2>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" class="panel-card form-panel">
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label class="form-label" for="NomUnite">Nom de l'unité (français)</label>
+            <input class="form-input" id="NomUnite" name="NomUnite" maxlength="200" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="NomUniteAr">Nom de l'unité (arabe)</label>
+            <input class="form-input arabic-font" id="NomUniteAr" name="NomUniteAr" maxlength="200" dir="rtl" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="TypeUnite">Type</label>
+        <select class="form-select" id="TypeUnite" name="TypeUnite" asp-items="ViewBag.Types" required>
+            <option value="">— Sélectionner —</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="IdVille">Ville</label>
+        <select class="form-select" id="IdVille" name="IdVille" asp-items="ViewBag.Villes" required>
+            <option value="">— Sélectionner —</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="IdUniteParent">Unité parente (facultatif)</label>
+        <select class="form-select" id="IdUniteParent" name="IdUniteParent" asp-items="ViewBag.Parents">
+            <option value="">Aucune (niveau supérieur)</option>
+        </select>
+    </div>
+    <div class="page-actions-group mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>

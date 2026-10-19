@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Nouveau pays";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">NOUVEAU PAYS</h2>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" class="panel-card form-panel">
+    <div class="form-group">
+        <label class="form-label" for="CodePays">Code</label>
+        <input class="form-input" id="CodePays" name="CodePays" maxlength="30" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="NomPaysFr">Nom (français)</label>
+        <input class="form-input" id="NomPaysFr" name="NomPaysFr" maxlength="100" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="NomPaysAr">Nom (arabe)</label>
+        <input class="form-input arabic-font" id="NomPaysAr" name="NomPaysAr" maxlength="100" dir="rtl" required />
+    </div>
+    <div class="form-check mt-3">
+        <input class="form-check-input" type="checkbox" id="EstLocal" name="EstLocal" value="true" />
+        <label class="form-check-label" for="EstLocal">Pays local (un seul autorisé)</label>
+    </div>
+    <div class="page-actions-group mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>

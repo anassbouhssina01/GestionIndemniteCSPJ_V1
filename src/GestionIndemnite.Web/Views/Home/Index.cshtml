@@ -1,0 +1,72 @@
+﻿@{
+    ViewData["Title"] = "Tableau de bord";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">TABLEAU DE BORD</h2>
+        <p class="page-description">Module RH Organisation — fonctionnaires, organigramme et bureau d'ordre.</p>
+    </div>
+</div>
+
+<div class="info-panels-grid">
+    <div class="panel-card">
+        <h4 class="panel-card-title">Référentiels</h4>
+        <p class="page-description">Cadres, grades, responsabilités, statuts administratifs, pays et villes.</p>
+        <div class="page-actions-group">
+            <a class="btn btn-sm btn-outline" asp-controller="Cadre" asp-action="Index">Cadres</a>
+            <a class="btn btn-sm btn-outline" asp-controller="Grade" asp-action="Index">Grades</a>
+            <a class="btn btn-sm btn-outline" asp-controller="Responsabilite" asp-action="Index">Responsabilités</a>
+            <a class="btn btn-sm btn-outline" asp-controller="StatutAdministratif" asp-action="Index">Statuts</a>
+            <a class="btn btn-sm btn-outline" asp-controller="Pays" asp-action="Index">Pays</a>
+            <a class="btn btn-sm btn-outline" asp-controller="Ville" asp-action="Index">Villes</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <h4 class="panel-card-title">Fonctionnaires</h4>
+        <p class="page-description">Dossiers des fonctionnaires, RIB et documents justificatifs.</p>
+        <div class="page-actions-group">
+            <a class="btn btn-sm btn-outline" asp-controller="Fonctionnaire" asp-action="Index">Fonctionnaires</a>
+            <a class="btn btn-sm btn-outline" asp-controller="PieceJointe" asp-action="Index">Documents</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <h4 class="panel-card-title">Organigramme</h4>
+        <p class="page-description">Tribunaux et unités organisationnelles avec leur hiérarchie.</p>
+        <div class="page-actions-group">
+            <a class="btn btn-sm btn-outline" asp-controller="Tribunal" asp-action="Index">Tribunaux</a>
+            <a class="btn btn-sm btn-outline" asp-controller="Unite" asp-action="Index">Unités</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <h4 class="panel-card-title">Historiques</h4>
+        <p class="page-description">Périodes des grades, situations, affectations et responsabilités.</p>
+        <div class="page-actions-group">
+            <a class="btn btn-sm btn-outline" asp-controller="HistoriqueCadreGrade" asp-action="Index">Grades</a>
+            <a class="btn btn-sm btn-outline" asp-controller="SituationAdministrative" asp-action="Index">Situations</a>
+            <a class="btn btn-sm btn-outline" asp-controller="HistoriqueAffectation" asp-action="Index">Affectations</a>
+            <a class="btn btn-sm btn-outline" asp-controller="HistoriqueResponsabilite" asp-action="Index">Responsabilités</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <h4 class="panel-card-title">Rapports</h4>
+        <p class="page-description">Trous de carrière, périodes sans justificatif et chevauchements.</p>
+        <div class="page-actions-group">
+            <a class="btn btn-sm btn-outline" asp-controller="Rapport" asp-action="Trous">Trous</a>
+            <a class="btn btn-sm btn-outline" asp-controller="Rapport" asp-action="SansJustificatif">Sans justificatif</a>
+            <a class="btn btn-sm btn-outline" asp-controller="Rapport" asp-action="Chevauchements">Chevauchements</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <h4 class="panel-card-title">Import Excel</h4>
+        <p class="page-description">Reprise de données par fichier Excel, en mode validation seule ou enregistrement.</p>
+        <div class="page-actions-group">
+            <a class="btn btn-sm btn-outline" asp-controller="Import" asp-action="Index">Importer</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Nouvelle responsabilité";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">NOUVELLE RESPONSABILITÉ</h2>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" class="panel-card form-panel">
+    <div class="form-group">
+        <label class="form-label" for="CodeResponsabilite">Code</label>
+        <input class="form-input" id="CodeResponsabilite" name="CodeResponsabilite" maxlength="30" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="LibelleResponsabiliteFr">Libellé (français)</label>
+        <input class="form-input" id="LibelleResponsabiliteFr" name="LibelleResponsabiliteFr" maxlength="200" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="LibelleResponsabiliteAr">Libellé (arabe)</label>
+        <input class="form-input arabic-font" id="LibelleResponsabiliteAr" name="LibelleResponsabiliteAr" maxlength="200" dir="rtl" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="Description">Description</label>
+        <textarea class="form-textarea" id="Description" name="Description" maxlength="1000" rows="3"></textarea>
+    </div>
+    <div class="page-actions-group mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>

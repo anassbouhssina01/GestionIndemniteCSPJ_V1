@@ -1,0 +1,41 @@
+@model GestionIndemnite.Application.RHOrganisation.DTOs.StatutAdministratifDto
+@{
+    ViewData["Title"] = "Modifier le statut administratif";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">MODIFIER LE STATUT ADMINISTRATIF</h2>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" asp-route-id="@Model.Id" class="panel-card form-panel">
+    <div class="form-group">
+        <label class="form-label">Code</label>
+        <input class="form-input" value="@Model.CodeStatut" readonly />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="LibelleStatutFr">Libellé (français)</label>
+        <input class="form-input" id="LibelleStatutFr" name="LibelleStatutFr" maxlength="200" value="@Model.LibelleStatutFr" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="LibelleStatutAr">Libellé (arabe)</label>
+        <input class="form-input arabic-font" id="LibelleStatutAr" name="LibelleStatutAr" maxlength="200" dir="rtl" value="@Model.LibelleStatutAr" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="Description">Description</label>
+        <textarea class="form-textarea" id="Description" name="Description" maxlength="1000" rows="3">@Model.Description</textarea>
+    </div>
+    <div class="form-check mt-3">
+        <input type="hidden" name="EstActif" value="false" />
+        <input class="form-check-input" type="checkbox" id="EstActif" name="EstActif" value="true" @(Model.EstActif ? "checked" : "") />
+        <label class="form-check-label" for="EstActif">Actif</label>
+    </div>
+    <div class="page-actions-group mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>

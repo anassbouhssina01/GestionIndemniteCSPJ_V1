@@ -1,0 +1,146 @@
+@model IReadOnlyList<GestionIndemnite.Application.RHOrganisation.DTOs.HistoriqueAffectationDto>
+@using GestionIndemnite.Application.RHOrganisation.DTOs
+@using GestionIndemnite.Domain.RHOrganisation.Enums
+@{
+    ViewData["Title"] = "Historique des affectations";
+    var fonctionnaire = (FonctionnaireDto?)ViewData["Fonctionnaire"];
+}
+
+@if (fonctionnaire is null)
+{
+    <div class="page-header-row">
+        <div class="page-title-group">
+            <h2 class="page-title-serif">HISTORIQUE DES AFFECTATIONS</h2>
+            <p class="page-description">Sélectionnez un fonctionnaire pour consulter et compléter son historique des affectations.</p>
+        </div>
+    </div>
+    @await Html.PartialAsync("_RechercheFonctionnaire")
+}
+else
+{
+    var tribunaux = (IReadOnlyList<TribunalDto>)ViewBag.Tribunaux;
+    var unites = (IReadOnlyList<UniteOrganisationnelleDto>)ViewBag.Unites;
+    var documents = (IReadOnlyList<PieceJointeDto>)ViewBag.Documents;
+    var sectionsFr = (Dictionary<SectionTribunal, string>)ViewBag.SectionsFr;
+
+    <div class="page-header-row">
+        <div class="page-title-group">
+            <h2 class="page-title-serif">AFFECTATIONS</h2>
+            <p class="page-description">@fonctionnaire.Matricule @fonctionnaire.NomFr @fonctionnaire.PrenomFr</p>
+        </div>
+        <div class="page-actions-group">
+            <a class="btn btn-outline-dark" asp-action="Index">Changer de fonctionnaire</a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Affectation</th>
+                        <th>Section</th>
+                        <th>Unité de travail</th>
+                        <th>Début</th>
+                        <th>Fin</th>
+                        <th>Document</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Count == 0)
+                    {
+                        <tr><td colspan="6" class="text-center text-muted">Aucune période enregistrée.</td></tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        var affectation = item.IdTribunalAffectation.HasValue
+                            ? tribunaux.FirstOrDefault(t => t.Id == item.IdTribunalAffectation)?.NomTribunal
+                            : unites.FirstOrDefault(u => u.Id == item.IdUniteAffectation)?.NomUnite;
+                        var travail = unites.FirstOrDefault(u => u.Id == item.IdUniteTravail)?.NomUnite;
+                        var document = documents.FirstOrDefault(d => d.Id == item.IdDocument);
+                        <tr>
+                            <td>@(affectation ?? "—")</td>
+                            <td>@(item.SectionTribunal.HasValue && sectionsFr.TryGetValue(item.SectionTribunal.Value, out var s) ? s : "—")</td>
+                            <td>@(travail ?? "—")</td>
+                            <td>@item.DateDebut.ToString("dd/MM/yyyy")</td>
+                            <td>@(item.DateFin?.ToString("dd/MM/yyyy") ?? "—")</td>
+                            <td>@(document?.NumeroDocument ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel-card mt-4">
+        <h4 class="panel-card-title">Ajouter une affectation</h4>
+        <p class="page-description">Remplir exactement l'un des deux champs : tribunal d'affectation ou unité d'affectation.</p>
+        <form method="post" asp-action="Ajouter" asp-route-id="@fonctionnaire.Id">
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="IdTribunalAffectation">Tribunal d'affectation</label>
+                    <select class="form-select" id="IdTribunalAffectation" name="IdTribunalAffectation">
+                        <option value="">—</option>
+                        @foreach (var tribunal in tribunaux)
+                        {
+                            <option value="@tribunal.Id">@tribunal.NomTribunal</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="IdUniteAffectation">Unité d'affectation</label>
+                    <select class="form-select" id="IdUniteAffectation" name="IdUniteAffectation">
+                        <option value="">—</option>
+                        @foreach (var unite in unites)
+                        {
+                            <option value="@unite.Id">@unite.NomUnite</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-grid-3">
+                <div class="form-group">
+                    <label class="form-label" for="SectionTribunal">Section</label>
+                    <select class="form-select" id="SectionTribunal" name="SectionTribunal">
+                        <option value="">—</option>
+                        <option value="Parquet">Parquet</option>
+                        <option value="Presidence">Présidence</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="IdUniteTravail">Unité de travail</label>
+                    <select class="form-select" id="IdUniteTravail" name="IdUniteTravail">
+                        <option value="">—</option>
+                        @foreach (var unite in unites)
+                        {
+                            <option value="@unite.Id">@unite.NomUnite</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="IdDocument">Document (optionnel)</label>
+                    <select class="form-select" id="IdDocument" name="IdDocument">
+                        <option value="">—</option>
+                        @foreach (var document in documents)
+                        {
+                            <option value="@document.Id">@document.NumeroDocument — @document.Emetteur (@document.AnneeDocument)</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="DateDebut">Début</label>
+                    <input class="form-input" type="date" id="DateDebut" name="DateDebut" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="DateFin">Fin</label>
+                    <input class="form-input" type="date" id="DateFin" name="DateFin" />
+                </div>
+            </div>
+            <div class="page-actions-group mt-4">
+                <button type="submit" class="btn btn-primary">Ajouter</button>
+            </div>
+        </form>
+    </div>
+}

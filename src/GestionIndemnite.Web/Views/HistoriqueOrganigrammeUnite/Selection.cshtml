@@ -1,0 +1,64 @@
+@model IReadOnlyList<GestionIndemnite.Application.RHOrganisation.DTOs.UniteOrganisationnelleDto>
+@{
+    ViewData["Title"] = "Historique de l'organigramme des unités";
+    var nom = (string?)ViewBag.Nom;
+    var typesFr = (IReadOnlyDictionary<GestionIndemnite.Domain.RHOrganisation.Enums.TypeUnite, string>)ViewBag.TypesFr;
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">HISTORIQUE DE L'ORGANIGRAMME DES UNITÉS</h2>
+        <p class="page-description">Sélectionnez une unité organisationnelle pour consulter et modifier l'historique de son rattachement hiérarchique.</p>
+    </div>
+</div>
+
+<form method="get" action="@Url.Action("Index")" class="filter-toolbar">
+    <div class="filter-group">
+        <label class="filter-label" for="nom">Nom de l'unité</label>
+        <input class="form-input" id="nom" name="nom" value="@nom" />
+    </div>
+    <div class="filter-group">
+        <button type="submit" class="btn btn-outline btn-sm">Rechercher</button>
+    </div>
+</form>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Statut</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="4" class="text-center text-muted">Aucune unité.</td></tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.NomUnite</td>
+                        <td><span class="badge-type-tribunal">@typesFr[item.TypeUnite]</span></td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="badge-statut-pill green">Actif</span>
+                            }
+                            else
+                            {
+                                <span class="badge-statut-pill gray">Inactif</span>
+                            }
+                        </td>
+                        <td class="text-right">
+                            <a class="btn-table-action" asp-action="Index" asp-route-id="@item.Id">Ouvrir</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

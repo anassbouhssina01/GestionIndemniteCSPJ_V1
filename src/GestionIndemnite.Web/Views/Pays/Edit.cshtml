@@ -1,0 +1,42 @@
+@model GestionIndemnite.Application.RHOrganisation.DTOs.PaysDto
+@{
+    ViewData["Title"] = "Modifier le pays";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">MODIFIER LE PAYS</h2>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" asp-route-id="@Model.Id" class="panel-card form-panel">
+    <div class="form-group">
+        <label class="form-label">Code</label>
+        <input class="form-input" value="@Model.CodePays" readonly />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="NomPaysFr">Nom (français)</label>
+        <input class="form-input" id="NomPaysFr" name="NomPaysFr" maxlength="100" value="@Model.NomPaysFr" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="NomPaysAr">Nom (arabe)</label>
+        <input class="form-input arabic-font" id="NomPaysAr" name="NomPaysAr" maxlength="100" dir="rtl" value="@Model.NomPaysAr" required />
+    </div>
+    <div class="form-check mt-3">
+        <input type="hidden" name="EstLocal" value="false" />
+        <input class="form-check-input" type="checkbox" id="EstLocal" name="EstLocal" value="true" @(Model.EstLocal ? "checked" : "") />
+        <label class="form-check-label" for="EstLocal">Pays local (un seul autorisé)</label>
+    </div>
+    <div class="form-check mt-2">
+        <input type="hidden" name="EstActif" value="false" />
+        <input class="form-check-input" type="checkbox" id="EstActif" name="EstActif" value="true" @(Model.EstActif ? "checked" : "") />
+        <label class="form-check-label" for="EstActif">Actif</label>
+    </div>
+    <div class="page-actions-group mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>

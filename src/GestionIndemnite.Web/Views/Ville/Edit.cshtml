@@ -1,0 +1,50 @@
+@model GestionIndemnite.Application.RHOrganisation.DTOs.VilleDto
+@{
+    ViewData["Title"] = "Modifier la ville";
+    var pays = (Dictionary<Guid, string>)ViewBag.Pays;
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">MODIFIER LA VILLE</h2>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" asp-route-id="@Model.Id" class="panel-card form-panel">
+    <div class="form-group">
+        <label class="form-label">Pays</label>
+        <input class="form-input" value="@(pays.TryGetValue(Model.IdPays, out var nomPays) ? nomPays : Model.IdPays.ToString())" readonly />
+    </div>
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label class="form-label" for="NomVille">Nom de la ville (français)</label>
+            <input class="form-input" id="NomVille" name="NomVille" maxlength="100" value="@Model.NomVille" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="NomVilleAr">Nom de la ville (arabe)</label>
+            <input class="form-input arabic-font" id="NomVilleAr" name="NomVilleAr" maxlength="100" dir="rtl" value="@Model.NomVilleAr" />
+        </div>
+    </div>
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label class="form-label" for="Latitude">Latitude</label>
+            <input class="form-input" id="Latitude" name="Latitude" type="number" step="0.000001" value="@Model.Latitude" />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="Longitude">Longitude</label>
+            <input class="form-input" id="Longitude" name="Longitude" type="number" step="0.000001" value="@Model.Longitude" />
+        </div>
+    </div>
+    <div class="form-check mt-3">
+        <input type="hidden" name="IsActive" value="false" />
+        <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" value="true" @(Model.IsActive ? "checked" : "") />
+        <label class="form-check-label" for="IsActive">Actif</label>
+    </div>
+    <div class="page-actions-group mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>

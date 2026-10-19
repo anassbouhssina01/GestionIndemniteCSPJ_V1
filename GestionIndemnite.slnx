@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GestionIndemnite.Application/GestionIndemnite.Application.csproj" />
+    <Project Path="src/GestionIndemnite.Domain/GestionIndemnite.Domain.csproj" />
+    <Project Path="src/GestionIndemnite.Infrastructure/GestionIndemnite.Infrastructure.csproj" />
+    <Project Path="src/GestionIndemnite.Web/GestionIndemnite.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GestionIndemnite.Tests/GestionIndemnite.Tests.csproj" />
+  </Folder>
+</Solution>

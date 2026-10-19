@@ -1,0 +1,63 @@
+@{
+    var matricule = (string?)ViewBag.Matricule;
+    var cin = (string?)ViewBag.Cin;
+    var nom = (string?)ViewBag.Nom;
+    var rechercheFaite = (bool)(ViewBag.RechercheFaite ?? false);
+    var resultats = (IReadOnlyList<GestionIndemnite.Application.RHOrganisation.DTOs.FonctionnaireDto>)
+        (ViewBag.Resultats ?? Array.Empty<GestionIndemnite.Application.RHOrganisation.DTOs.FonctionnaireDto>());
+}
+
+<form method="get" action="@Url.Action("Index")" class="filter-toolbar">
+    <div class="filter-group">
+        <label class="filter-label" for="matricule">Matricule</label>
+        <input class="form-input" id="matricule" name="matricule" value="@matricule" />
+    </div>
+    <div class="filter-group">
+        <label class="filter-label" for="cin">CIN</label>
+        <input class="form-input" id="cin" name="cin" value="@cin" />
+    </div>
+    <div class="filter-group">
+        <label class="filter-label" for="nom">Nom</label>
+        <input class="form-input" id="nom" name="nom" value="@nom" />
+    </div>
+    <div class="filter-group">
+        <button type="submit" class="btn btn-outline btn-sm">Rechercher</button>
+    </div>
+</form>
+
+@if (rechercheFaite)
+{
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Matricule</th>
+                        <th>CIN</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (resultats.Count == 0)
+                    {
+                        <tr><td colspan="5" class="text-center text-muted">Aucun fonctionnaire trouvé.</td></tr>
+                    }
+                    @foreach (var f in resultats)
+                    {
+                        <tr>
+                            <td>@f.Matricule</td>
+                            <td>@f.Cin</td>
+                            <td>@f.NomFr</td>
+                            <td>@f.PrenomFr</td>
+                            <td class="text-right">
+                                <a class="btn-table-action" asp-action="Index" asp-route-id="@f.Id">Ouvrir</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

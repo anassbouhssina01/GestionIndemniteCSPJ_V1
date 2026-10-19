@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Nouveau fonctionnaire";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">NOUVEAU FONCTIONNAIRE</h2>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" class="panel-card form-panel-wide">
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label class="form-label" for="Matricule">Matricule</label>
+            <input class="form-input" id="Matricule" name="Matricule" maxlength="20" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="Cin">CIN</label>
+            <input class="form-input" id="Cin" name="Cin" maxlength="20" required />
+        </div>
+    </div>
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label class="form-label" for="NomFr">Nom (français)</label>
+            <input class="form-input" id="NomFr" name="NomFr" maxlength="100" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="PrenomFr">Prénom (français)</label>
+            <input class="form-input" id="PrenomFr" name="PrenomFr" maxlength="100" required />
+        </div>
+    </div>
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label class="form-label" for="NomAr">Nom (arabe)</label>
+            <input class="form-input arabic-font" id="NomAr" name="NomAr" maxlength="100" dir="rtl" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="PrenomAr">Prénom (arabe)</label>
+            <input class="form-input arabic-font" id="PrenomAr" name="PrenomAr" maxlength="100" dir="rtl" required />
+        </div>
+    </div>
+    <div class="form-grid-3">
+        <div class="form-group">
+            <label class="form-label" for="DateNaissance">Date de naissance</label>
+            <input class="form-input" type="date" id="DateNaissance" name="DateNaissance" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="DateRecrutement">Date de recrutement</label>
+            <input class="form-input" type="date" id="DateRecrutement" name="DateRecrutement" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="Genre">Genre</label>
+            <select class="form-select" id="Genre" name="Genre" asp-items="ViewBag.Genres" required>
+                <option value="">— Sélectionner —</option>
+            </select>
+        </div>
+    </div>
+    <div class="page-actions-group mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>

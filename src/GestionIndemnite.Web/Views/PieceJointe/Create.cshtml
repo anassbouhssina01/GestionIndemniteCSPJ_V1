@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Téléverser un document";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">TÉLÉVERSER UN DOCUMENT</h2>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="panel-card form-panel">
+    <div class="form-group">
+        <label class="form-label" for="fichier">Fichier PDF (10 Mo maximum)</label>
+        <input class="form-input" type="file" id="fichier" name="fichier" accept="application/pdf" required />
+        @Html.ValidationMessage("fichier", "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="NumeroDocument">Numéro de document</label>
+        <input class="form-input" id="NumeroDocument" name="NumeroDocument" maxlength="50" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="DateDocument">Date du document</label>
+        <input class="form-input" type="date" id="DateDocument" name="DateDocument" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="Emetteur">Émetteur</label>
+        <input class="form-input" id="Emetteur" name="Emetteur" maxlength="300" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="TypeDocument">Type de document</label>
+        <input class="form-input" id="TypeDocument" name="TypeDocument" maxlength="100" required />
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="Objet">Objet</label>
+        <textarea class="form-textarea" id="Objet" name="Objet" maxlength="500" rows="2" required></textarea>
+    </div>
+    <div class="page-actions-group mt-4">
+        <button type="submit" class="btn btn-primary">Téléverser</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>

@@ -1,0 +1,111 @@
+/* ============================================================
+   app.css — ajustements propres à l'application, bâtis SUR theme.css
+   (theme.css reste intact : couleurs, typographie, composants)
+   ============================================================ */
+
+/* ---- Navigation latérale : liens <a> rendus comme les boutons du thème ---- */
+.sidebar a.nav-item,
+.sidebar a.sub-nav-item {
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.nav-item > span { flex: 1; }
+.nav-item .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+.sub-nav-item .sub-nav-text { font-size: 13px; }
+
+/* ---- Zones de formulaire ---- */
+.form-panel { max-width: 780px; }
+.form-panel-wide { max-width: 1100px; }
+
+/* Espacement vertical entre les blocs de champs */
+.form-group + .form-group,
+.form-group + .form-grid-2,
+.form-group + .form-grid-3,
+.form-grid-2 + .form-group,
+.form-grid-3 + .form-group,
+.form-grid-2 + .form-grid-2,
+.form-grid-3 + .form-grid-3,
+.form-grid-2 + .form-grid-3,
+.form-grid-3 + .form-grid-2 { margin-top: 16px; }
+
+.panel-card > form { margin: 0; }
+.panel-card + .panel-card { margin-top: 20px; }
+
+/* Cases à cocher (les règles Bootstrap sont harmonisées avec le thème) */
+.form-check { display: flex; align-items: center; gap: 8px; margin-bottom: 0; padding-left: 0; min-height: 0; }
+.form-check .form-check-input { width: 16px; height: 16px; margin: 0; flex-shrink: 0; float: none; }
+.form-check .form-check-label { font-size: 13.5px; color: var(--text-main); }
+
+/* ---- Boutons d'action dans les tableaux ---- */
+.data-table td form { display: inline; }
+.btn-table-action { display: inline-flex; align-items: center; gap: 4px; margin: 1px 0; text-decoration: none; }
+.data-table td .btn-table-action + .btn-table-action,
+.data-table td .btn-table-action + form { margin-left: 6px; }
+.data-table td form + form { margin-left: 6px; }
+
+/* ---- Bandeau d'erreur / succès ---- */
+.app-view > .alert { border-radius: var(--radius-md); margin-bottom: 18px; }
+
+/* ---- Fiche fonctionnaire ---- */
+.kv-item { gap: 16px; }
+.kv-item .v { text-align: right; }
+.profile-hero-card .btn-hero-back { text-decoration: none; }
+.profile-hero-card .hero-names .badge-statut-pill { align-self: flex-start; }
+
+/* ---- Barre de filtres : champs texte compacts ---- */
+.filter-toolbar .form-input { width: 220px; }
+.filter-toolbar .form-select { min-width: 180px; }
+
+/* ---- Cartes de contenu ---- */
+.panel-card .page-description { margin-bottom: 14px; }
+.panel-card form .page-description { margin-top: -4px; }
+
+/* ---- Petits ajustements ---- */
+.page-description { max-width: 900px; }
+.text-right { text-align: right; }
+.data-table td .badge-statut-pill { white-space: nowrap; }
+
+/* ---- Dossier fonctionnaire : clôture rapide d'une responsabilité ---- */
+.data-table td form.inline-close-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.form-input-inline {
+  width: 150px;
+  padding: 5px 8px;
+  font-size: 12.5px;
+}
+
+/* ---- Impression de la fiche fonctionnaire ---- */
+@media print {
+  .sidebar,
+  .top-navbar,
+  .breadcrumb-nav,
+  .profile-actions-bar,
+  .profile-tabs-header,
+  .modal-overlay,
+  .page-actions-group,
+  .btn-icon-nav {
+    display: none !important;
+  }
+
+  .main-wrapper,
+  .content-area {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .profile-tab-content {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+
+  .profile-hero-card {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+

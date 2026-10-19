@@ -1,0 +1,74 @@
+@model IReadOnlyList<GestionIndemnite.Application.RHOrganisation.DTOs.FonctionnaireDto>
+@{
+    ViewData["Title"] = "Fonctionnaires";
+    var matricule = (string?)ViewBag.Matricule;
+    var cin = (string?)ViewBag.Cin;
+    var nom = (string?)ViewBag.Nom;
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">FONCTIONNAIRES</h2>
+        <p class="page-description">Dossiers des fonctionnaires, RIB et documents justificatifs.</p>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-primary" asp-action="Create">Nouveau fonctionnaire</a>
+    </div>
+</div>
+
+<form method="get" class="filter-toolbar">
+    <div class="filter-group">
+        <label class="filter-label" for="matricule">Matricule</label>
+        <input class="form-input" id="matricule" name="matricule" value="@matricule" />
+    </div>
+    <div class="filter-group">
+        <label class="filter-label" for="cin">CIN</label>
+        <input class="form-input" id="cin" name="cin" value="@cin" />
+    </div>
+    <div class="filter-group">
+        <label class="filter-label" for="nom">Nom</label>
+        <input class="form-input" id="nom" name="nom" value="@nom" />
+    </div>
+    <div class="filter-group">
+        <button type="submit" class="btn btn-outline btn-sm">Rechercher</button>
+    </div>
+</form>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Matricule</th>
+                    <th>CIN</th>
+                    <th>Nom (français)</th>
+                    <th>Prénom (français)</th>
+                    <th>Nom (arabe)</th>
+                    <th>Date de naissance</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="7" class="text-center text-muted">Aucun fonctionnaire.</td></tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Matricule</td>
+                        <td>@item.Cin</td>
+                        <td>@item.NomFr</td>
+                        <td>@item.PrenomFr</td>
+                        <td dir="rtl">@item.NomAr @item.PrenomAr</td>
+                        <td>@item.DateNaissance.ToString("dd/MM/yyyy")</td>
+                        <td class="text-right">
+                            <a class="btn-table-action" asp-action="Details" asp-route-id="@item.Id">Détails</a>
+                            <a class="btn-table-action" asp-action="Edit" asp-route-id="@item.Id">Modifier</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

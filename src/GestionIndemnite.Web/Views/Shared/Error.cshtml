@@ -1,0 +1,27 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Erreur";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">ERREUR</h2>
+        <p class="page-description">Une erreur est survenue lors du traitement de votre demande.</p>
+    </div>
+</div>
+
+<div class="panel-card">
+    @if (Model.ShowRequestId)
+    {
+        <div class="key-value-list">
+            <div class="kv-item">
+                <span class="k">Identifiant de la requête</span>
+                <span class="v font-mono">@Model.RequestId</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="text-muted mb-0">Aucun détail supplémentaire n'est disponible.</p>
+    }
+</div>
