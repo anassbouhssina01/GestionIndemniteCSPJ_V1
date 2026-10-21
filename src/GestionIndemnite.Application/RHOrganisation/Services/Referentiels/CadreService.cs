@@ -17,19 +17,19 @@ public class CadreService
 
     public async Task<CadreDto> CreateAsync(CreateCadreCommand cmd, CancellationToken ct = default)
     {
-        var code = cmd.CodeCadre.Trim();
+        var code = (cmd.CodeCadre ?? string.Empty).Trim();
         if (string.IsNullOrEmpty(code))
-            throw new RegleMetierException("رمز الإطار مطلوب");
+            throw new RegleMetierException("Le code du cadre est obligatoire.");
 
         if (await _db.Cadres.AnyAsync(c => c.CodeCadre == code, ct))
-            throw new RegleMetierException($"الرمز «{code}» مستعمل من قبل");
+            throw new RegleMetierException($"Le code «{code}» est déjà utilisé.");
 
         var cadre = new Cadre
         {
             Id = Guid.NewGuid(),
             CodeCadre = code,
-            LibelleCadreAr = cmd.LibelleCadreAr.Trim(),
-            LibelleCadreFr = cmd.LibelleCadreFr.Trim(),
+            LibelleCadreAr = (cmd.LibelleCadreAr ?? string.Empty).Trim(),
+            LibelleCadreFr = (cmd.LibelleCadreFr ?? string.Empty).Trim(),
             Description = cmd.Description?.Trim()
         };
 
@@ -42,13 +42,13 @@ public class CadreService
     public async Task<CadreDto> UpdateAsync(Guid id, UpdateCadreCommand cmd, CancellationToken ct = default)
     {
         var cadre = await _db.Cadres.FirstOrDefaultAsync(c => c.Id == id, ct)
-            ?? throw new RegleMetierException("الإطار غير موجود");
+            ?? throw new RegleMetierException("Le cadre est introuvable.");
 
         if (cadre.EstActif && !cmd.EstActif && await EstUtiliseAsync(id, ct))
-            throw new RegleMetierException("لا يمكن تعطيل إطار مستعمل في السجلات");
+            throw new RegleMetierException("Impossible de désactiver un cadre utilisé dans les dossiers.");
 
-        cadre.LibelleCadreAr = cmd.LibelleCadreAr.Trim();
-        cadre.LibelleCadreFr = cmd.LibelleCadreFr.Trim();
+        cadre.LibelleCadreAr = (cmd.LibelleCadreAr ?? string.Empty).Trim();
+        cadre.LibelleCadreFr = (cmd.LibelleCadreFr ?? string.Empty).Trim();
         cadre.Description = cmd.Description?.Trim();
         cadre.EstActif = cmd.EstActif;
 
@@ -59,7 +59,7 @@ public class CadreService
     public async Task<CadreDto> GetAsync(Guid id, CancellationToken ct = default)
     {
         var cadre = await _db.Cadres.FirstOrDefaultAsync(c => c.Id == id, ct)
-            ?? throw new RegleMetierException("الإطار غير موجود");
+            ?? throw new RegleMetierException("Le cadre est introuvable.");
         return ToDto(cadre);
     }
 
@@ -76,10 +76,10 @@ public class CadreService
     public async Task DisableAsync(Guid id, CancellationToken ct = default)
     {
         var cadre = await _db.Cadres.FirstOrDefaultAsync(c => c.Id == id, ct)
-            ?? throw new RegleMetierException("الإطار غير موجود");
+            ?? throw new RegleMetierException("Le cadre est introuvable.");
 
         if (await EstUtiliseAsync(id, ct))
-            throw new RegleMetierException("لا يمكن تعطيل إطار مستعمل في السجلات");
+            throw new RegleMetierException("Impossible de désactiver un cadre utilisé dans les dossiers.");
 
         cadre.EstActif = false;
         await _db.SaveChangesAsync(ct);
@@ -88,7 +88,7 @@ public class CadreService
     public async Task EnableAsync(Guid id, CancellationToken ct = default)
     {
         var cadre = await _db.Cadres.FirstOrDefaultAsync(c => c.Id == id, ct)
-            ?? throw new RegleMetierException("الإطار غير موجود");
+            ?? throw new RegleMetierException("Le cadre est introuvable.");
         cadre.EstActif = true;
         await _db.SaveChangesAsync(ct);
     }

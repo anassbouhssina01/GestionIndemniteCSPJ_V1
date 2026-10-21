@@ -19,21 +19,21 @@ public class UniteOrganisationnelleService
         CreateUniteOrganisationnelleCommand cmd,
         CancellationToken ct = default)
     {
-        var nom = cmd.NomUnite.Trim();
+        var nom = (cmd.NomUnite ?? string.Empty).Trim();
         if (string.IsNullOrEmpty(nom))
-            throw new RegleMetierException("اسم الهيكل مطلوب");
+            throw new RegleMetierException("Le nom de l'unité organisationnelle est obligatoire.");
 
         if (cmd.IdUniteParent.HasValue)
         {
             var exists = await _db.UnitesOrganisationnelles
                 .AnyAsync(u => u.Id == cmd.IdUniteParent.Value, ct);
             if (!exists)
-                throw new RegleMetierException("الهيكل الأب غير موجود");
+                throw new RegleMetierException("L'unité organisationnelle parente est introuvable.");
         }
 
         var dateDebut = DateOnly.FromDateTime(DateTime.UtcNow);
         if (await IsCycleAsync(cmd.IdUniteParent, dateDebut, ct))
-            throw new RegleMetierException("تمييز في الهيكلة: الهيكل لا يمكن أن يكون تابعا لنفسه أو لمن هو تابع له");
+            throw new RegleMetierException("Incohérence hiérarchique : une unité ne peut pas être rattachée à elle-même ni à l'une de ses unités subordonnées.");
 
         var unite = new UniteOrganisationnelle
         {
@@ -65,7 +65,7 @@ public class UniteOrganisationnelleService
     {
         var unite = await _db.UnitesOrganisationnelles.AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == id, ct)
-            ?? throw new RegleMetierException("الهيكل غير موجود");
+            ?? throw new RegleMetierException("L'unité organisationnelle est introuvable.");
         return ToDto(unite);
     }
 
@@ -100,7 +100,7 @@ public class UniteOrganisationnelleService
 
         var parent = await _db.UnitesOrganisationnelles.AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == record.IdUniteParent, ct)
-            ?? throw new RegleMetierException("الهيكل الأب غير موجود");
+            ?? throw new RegleMetierException("L'unité organisationnelle parente est introuvable.");
 
         return new ParentOrganigrammeDto(parent.Id, parent.NomUnite, record.DateDebut, record.DateFin);
     }
@@ -108,7 +108,7 @@ public class UniteOrganisationnelleService
     public async Task DisableAsync(Guid id, CancellationToken ct = default)
     {
         var unite = await _db.UnitesOrganisationnelles.FirstOrDefaultAsync(u => u.Id == id, ct)
-            ?? throw new RegleMetierException("الهيكل غير موجود");
+            ?? throw new RegleMetierException("L'unité organisationnelle est introuvable.");
         unite.IsActive = false;
         await _db.SaveChangesAsync(ct);
     }
@@ -116,7 +116,7 @@ public class UniteOrganisationnelleService
     public async Task EnableAsync(Guid id, CancellationToken ct = default)
     {
         var unite = await _db.UnitesOrganisationnelles.FirstOrDefaultAsync(u => u.Id == id, ct)
-            ?? throw new RegleMetierException("الهيكل غير موجود");
+            ?? throw new RegleMetierException("L'unité organisationnelle est introuvable.");
         unite.IsActive = true;
         await _db.SaveChangesAsync(ct);
     }

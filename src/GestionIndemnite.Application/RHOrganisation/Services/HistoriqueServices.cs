@@ -22,12 +22,12 @@ public class HistoriqueCadreGradeService
         CancellationToken ct = default)
     {
         if (!await _db.Fonctionnaires.AnyAsync(f => f.Id == cmd.IdFonctionnaire, ct))
-            throw new RegleMetierException("الموظف غير موجود");
+            throw new RegleMetierException("Le fonctionnaire est introuvable.");
         if (!await _db.Grades.AnyAsync(g => g.Id == cmd.IdGrade, ct))
-            throw new RegleMetierException("الدرجة غير موجودة");
+            throw new RegleMetierException("Le grade est introuvable.");
         if (cmd.IdDocument.HasValue &&
             !await _db.PieceJointes.AnyAsync(p => p.Id == cmd.IdDocument.Value, ct))
-            throw new RegleMetierException("المستند غير موجود");
+            throw new RegleMetierException("Le document est introuvable.");
 
         var entity = new HistoriqueCadreGrade
         {
@@ -71,12 +71,12 @@ public class HistoriqueCadreGradeService
         CancellationToken ct = default)
     {
         if (!await _db.Fonctionnaires.AnyAsync(f => f.Id == idFonctionnaire, ct))
-            throw new RegleMetierException("الموظف غير موجود");
+            throw new RegleMetierException("Le fonctionnaire est introuvable.");
         if (!await _db.Grades.AnyAsync(g => g.Id == idGrade, ct))
-            throw new RegleMetierException("الدرجة غير موجودة");
+            throw new RegleMetierException("Le grade est introuvable.");
         if (idDocument.HasValue &&
             !await _db.PieceJointes.AnyAsync(p => p.Id == idDocument.Value, ct))
-            throw new RegleMetierException("المستند غير موجود");
+            throw new RegleMetierException("Le document est introuvable.");
 
         var entity = new HistoriqueCadreGrade
         {
@@ -117,16 +117,16 @@ public class SituationAdministrativeService
     {
         var fonctionnaire = await _db.Fonctionnaires
             .FirstOrDefaultAsync(f => f.Id == cmd.IdFonctionnaire, ct)
-            ?? throw new RegleMetierException("الموظف غير موجود");
+            ?? throw new RegleMetierException("Le fonctionnaire est introuvable.");
 
         if (!await _db.StatutAdministratifs.AnyAsync(s => s.Id == cmd.IdStatut, ct))
-            throw new RegleMetierException("الوضع الإداري غير موجود");
+            throw new RegleMetierException("La situation administrative est introuvable.");
         if (cmd.IdDocument.HasValue &&
             !await _db.PieceJointes.AnyAsync(p => p.Id == cmd.IdDocument.Value, ct))
-            throw new RegleMetierException("المستند غير موجود");
+            throw new RegleMetierException("Le document est introuvable.");
 
         if (cmd.DateDebut < fonctionnaire.DateRecrutement)
-            throw new RegleMetierException("التاريخ لا يمكن أن يسبق تاريخ التوظيف");
+            throw new RegleMetierException("La date ne peut pas précéder la date de recrutement.");
 
         var entity = new SituationAdministrative
         {
@@ -170,16 +170,16 @@ public class SituationAdministrativeService
     {
         var fonctionnaire = await _db.Fonctionnaires
             .FirstOrDefaultAsync(f => f.Id == idFonctionnaire, ct)
-            ?? throw new RegleMetierException("الموظف غير موجود");
+            ?? throw new RegleMetierException("Le fonctionnaire est introuvable.");
 
         if (!await _db.StatutAdministratifs.AnyAsync(s => s.Id == idStatut, ct))
-            throw new RegleMetierException("الوضع الإداري غير موجود");
+            throw new RegleMetierException("La situation administrative est introuvable.");
         if (idDocument.HasValue &&
             !await _db.PieceJointes.AnyAsync(p => p.Id == idDocument.Value, ct))
-            throw new RegleMetierException("المستند غير موجود");
+            throw new RegleMetierException("Le document est introuvable.");
 
         if (dateDebut < fonctionnaire.DateRecrutement)
-            throw new RegleMetierException("التاريخ لا يمكن أن يسبق تاريخ التوظيف");
+            throw new RegleMetierException("La date ne peut pas précéder la date de recrutement.");
 
         var entity = new SituationAdministrative
         {
@@ -225,19 +225,19 @@ public class HistoriqueAffectationService
             cmd.SectionTribunal);
 
         if (!await _db.Fonctionnaires.AnyAsync(f => f.Id == cmd.IdFonctionnaire, ct))
-            throw new RegleMetierException("الموظف غير موجود");
+            throw new RegleMetierException("Le fonctionnaire est introuvable.");
         if (cmd.IdTribunalAffectation.HasValue &&
             !await _db.Tribunaux.AnyAsync(t => t.Id == cmd.IdTribunalAffectation.Value, ct))
-            throw new RegleMetierException("المحكمة غير موجودة");
+            throw new RegleMetierException("Le tribunal est introuvable.");
         if (cmd.IdUniteAffectation.HasValue &&
             !await _db.UnitesOrganisationnelles.AnyAsync(u => u.Id == cmd.IdUniteAffectation.Value, ct))
-            throw new RegleMetierException("الهيكل غير موجود");
+            throw new RegleMetierException("L'unité organisationnelle est introuvable.");
         if (cmd.IdUniteTravail.HasValue &&
             !await _db.UnitesOrganisationnelles.AnyAsync(u => u.Id == cmd.IdUniteTravail.Value, ct))
-            throw new RegleMetierException("هيكل العمل غير موجود");
+            throw new RegleMetierException("L'unité de travail est introuvable.");
         if (cmd.IdDocument.HasValue &&
             !await _db.PieceJointes.AnyAsync(p => p.Id == cmd.IdDocument.Value, ct))
-            throw new RegleMetierException("المستند غير موجود");
+            throw new RegleMetierException("Le document est introuvable.");
 
         var entity = new HistoriqueAffectation
         {
@@ -292,19 +292,19 @@ public class HistoriqueAffectationService
             sectionTribunal);
 
         if (!await _db.Fonctionnaires.AnyAsync(f => f.Id == idFonctionnaire, ct))
-            throw new RegleMetierException("الموظف غير موجود");
+            throw new RegleMetierException("Le fonctionnaire est introuvable.");
         if (idTribunalAffectation.HasValue &&
             !await _db.Tribunaux.AnyAsync(t => t.Id == idTribunalAffectation.Value, ct))
-            throw new RegleMetierException("المحكمة غير موجودة");
+            throw new RegleMetierException("Le tribunal est introuvable.");
         if (idUniteAffectation.HasValue &&
             !await _db.UnitesOrganisationnelles.AnyAsync(u => u.Id == idUniteAffectation.Value, ct))
-            throw new RegleMetierException("الهيكل غير موجود");
+            throw new RegleMetierException("L'unité organisationnelle est introuvable.");
         if (idUniteTravail.HasValue &&
             !await _db.UnitesOrganisationnelles.AnyAsync(u => u.Id == idUniteTravail.Value, ct))
-            throw new RegleMetierException("هيكل العمل غير موجود");
+            throw new RegleMetierException("L'unité de travail est introuvable.");
         if (idDocument.HasValue &&
             !await _db.PieceJointes.AnyAsync(p => p.Id == idDocument.Value, ct))
-            throw new RegleMetierException("المستند غير موجود");
+            throw new RegleMetierException("Le document est introuvable.");
 
         var entity = new HistoriqueAffectation
         {
@@ -349,21 +349,21 @@ public class HistoriqueResponsabiliteService
     {
         var exactementUn = cmd.IdTribunal.HasValue ^ cmd.IdUniteOrganisationnelle.HasValue;
         if (!exactementUn)
-            throw new RegleMetierException("يجب تحديد المحكمة أو الهيكل بدقة واحدة");
+            throw new RegleMetierException("Vous devez sélectionner exactement un tribunal ou une unité organisationnelle.");
 
         if (!await _db.Fonctionnaires.AnyAsync(f => f.Id == cmd.IdFonctionnaire, ct))
-            throw new RegleMetierException("الموظف غير موجود");
+            throw new RegleMetierException("Le fonctionnaire est introuvable.");
         if (!await _db.Responsabilites.AnyAsync(r => r.Id == cmd.IdResponsabilite, ct))
-            throw new RegleMetierException("المسؤولية غير موجودة");
+            throw new RegleMetierException("La responsabilité est introuvable.");
         if (cmd.IdTribunal.HasValue &&
             !await _db.Tribunaux.AnyAsync(t => t.Id == cmd.IdTribunal.Value, ct))
-            throw new RegleMetierException("المحكمة غير موجودة");
+            throw new RegleMetierException("Le tribunal est introuvable.");
         if (cmd.IdUniteOrganisationnelle.HasValue &&
             !await _db.UnitesOrganisationnelles.AnyAsync(u => u.Id == cmd.IdUniteOrganisationnelle.Value, ct))
-            throw new RegleMetierException("الهيكل غير موجود");
+            throw new RegleMetierException("L'unité organisationnelle est introuvable.");
         if (cmd.IdDocument.HasValue &&
             !await _db.PieceJointes.AnyAsync(p => p.Id == cmd.IdDocument.Value, ct))
-            throw new RegleMetierException("المستند غير موجود");
+            throw new RegleMetierException("Le document est introuvable.");
 
         var entity = new HistoriqueResponsabilite
         {
@@ -409,12 +409,12 @@ public class HistoriqueResponsabiliteService
     {
         var entity = await _db.HistoriqueResponsabilites
             .FirstOrDefaultAsync(h => h.Id == id, ct)
-            ?? throw new RegleMetierException("السجل غير موجود");
+            ?? throw new RegleMetierException("L'enregistrement est introuvable.");
 
         if (entity.DateFin is not null)
-            throw new RegleMetierException("هذا السجل مغلق مسبقاً");
+            throw new RegleMetierException("Cet enregistrement est déjà clôturé.");
         if (dateFin < entity.DateDebut)
-            throw new RegleMetierException("تاريخ النهاية يجب أن يلي تاريخ البداية");
+            throw new RegleMetierException("La date de fin doit être postérieure à la date de début.");
 
         entity.DateFin = dateFin;
         await _db.SaveChangesAsync(ct);

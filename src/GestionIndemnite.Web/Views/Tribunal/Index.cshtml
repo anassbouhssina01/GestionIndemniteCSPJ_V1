@@ -1,17 +1,36 @@
 @model IReadOnlyList<GestionIndemnite.Application.RHOrganisation.DTOs.TribunalDto>
+@using GestionIndemnite.Domain.RHOrganisation.Enums
 @{
     ViewData["Title"] = "Tribunaux";
     var inactifs = (bool)(ViewData["Inactifs"] ?? false);
+    var nomFiltre = (string?)ViewBag.Nom;
+    var typeFiltre = (TypeTribunal?)ViewBag.TypeFiltre;
+    var niveauFiltre = (NiveauJuridiction?)ViewBag.NiveauFiltre;
+    var idVilleFiltre = (Guid?)ViewBag.IdVilleFiltre;
+    var idRessortFiltre = (Guid?)ViewBag.IdRessortFiltre;
     var villes = (Dictionary<Guid, string>)ViewBag.Villes;
-    var typesFr = (Dictionary<GestionIndemnite.Domain.RHOrganisation.Enums.TypeTribunal, string>)ViewBag.TypesFr;
-    var niveauxFr = (Dictionary<GestionIndemnite.Domain.RHOrganisation.Enums.NiveauJuridiction, string>)ViewBag.NiveauxFr;
+    var typesFr = (Dictionary<TypeTribunal, string>)ViewBag.TypesFr;
+    var niveauxFr = (Dictionary<NiveauJuridiction, string>)ViewBag.NiveauxFr;
     var parents = (Dictionary<Guid, string?>)ViewBag.Parents;
+    var byId = (Dictionary<Guid, GestionIndemnite.Application.RHOrganisation.DTOs.TribunalDto>)ViewBag.ById;
+    var ressorts = (Dictionary<Guid, Guid?>)ViewBag.Ressorts;
+
+    var groupes = Model
+        .GroupBy(t => ressorts.TryGetValue(t.Id, out var ressortId) ? ressortId : null)
+        .Select(g => new
+        {
+            Ressort = g.Key is Guid caId && byId.TryGetValue(caId, out var ca) ? ca : null,
+            Items = g.OrderByDescending(t => (int)t.NiveauJuridiction).ThenBy(t => t.NomTribunal).ToList()
+        })
+        .OrderBy(g => g.Ressort is null ? 1 : 0)
+        .ThenBy(g => g.Ressort?.NomTribunal)
+        .ToList();
 }
 
 <div class="page-header-row">
     <div class="page-title-group">
         <h2 class="page-title-serif">TRIBUNAUX</h2>
-        <p class="page-description">Tribunaux et leur hiérarchie (cassation, cour d'appel, TPI, CJR).</p>
+        <p class="page-description">Juridictions classées par ressort (cour d'appel) et par niveau : cassation, cour d'appel, TPI, CJR.</p>
     </div>
     <div class="page-actions-group">
         <a class="btn btn-primary" asp-action="Create">Nouveau tribunal</a>
@@ -19,6 +38,54 @@
 </div>
 
 <form method="get" class="filter-toolbar">
+    <div class="filter-group">
+        <label class="filter-label" for="nom">Nom</label>
+        <input class="form-input" id="nom" name="nom" value="@nomFiltre" placeholder="Nom (français ou arabe)" />
+    </div>
+    <div class="filter-group">
+        <label class="filter-label" for="type">Type</label>
+        <select class="form-select" id="type" name="type">
+            <option value="">Tous</option>
+            @foreach (var item in typesFr)
+            {
+                <option value="@item.Key" selected="@(typeFiltre == item.Key)">@item.Value</option>
+            }
+        </select>
+    </div>
+    <div class="filter-group">
+        <label class="filter-label" for="niveau">Niveau</label>
+        <select class="form-select" id="niveau" name="niveau">
+            <option value="">Tous</option>
+            @foreach (var item in niveauxFr)
+            {
+                <option value="@item.Key" selected="@(niveauFiltre == item.Key)">@item.Value</option>
+            }
+        </select>
+    </div>
+    <div class="filter-group">
+        <label class="filter-label" for="idVille">Ville</label>
+        <select class="form-select" id="idVille" name="idVille">
+            <option value="">Toutes</option>
+            @foreach (var ville in villes.OrderBy(v => v.Value))
+            {
+                <option value="@ville.Key" selected="@(idVilleFiltre == ville.Key)">@ville.Value</option>
+            }
+        </select>
+    </div>
+    <div class="filter-group">
+        <label class="filter-label" for="idRessort">Ressort (cour d'appel)</label>
+        <select class="form-select" id="idRessort" name="idRessort">
+            <option value="">Tous</option>
+            @foreach (var ca in byId.Values.Where(t => t.NiveauJuridiction == NiveauJuridiction.CA).OrderBy(t => t.NomTribunal))
+            {
+                <option value="@ca.Id" selected="@(idRessortFiltre == ca.Id)">@ca.NomTribunal</option>
+            }
+        </select>
+    </div>
+    <div class="filter-group">
+        <button type="submit" class="btn btn-outline btn-sm">Filtrer</button>
+        <a class="btn btn-outline btn-sm" asp-action="Index">Réinitialiser</a>
+    </div>
     <div class="filter-group">
         <div class="form-check">
             <input class="form-check-input" type="checkbox" name="inactifs" value="true" id="inactifs" @(inactifs ? "checked" : "") onchange="this.form.submit()" />
@@ -37,7 +104,7 @@
                     <th>Type</th>
                     <th>Niveau</th>
                     <th>Ville</th>
-                    <th>Parent actuel</th>
+                    <th>Rattaché à</th>
                     <th>État</th>
                     <th class="text-right">Actions</th>
                 </tr>
@@ -45,51 +112,69 @@
             <tbody>
                 @if (Model.Count == 0)
                 {
-                    <tr><td colspan="8" class="text-center text-muted">Aucun tribunal.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted">Aucun tribunal ne correspond aux critères.</td></tr>
                 }
-                @foreach (var item in Model)
+                @foreach (var groupe in groupes)
                 {
-                    <tr>
-                        <td>@item.NomTribunal</td>
-                        <td dir="rtl">@(string.IsNullOrWhiteSpace(item.NomTribunalAr) ? "—" : item.NomTribunalAr)</td>
-                        <td><span class="badge-type-tribunal">@typesFr[item.TypeTribunal]</span></td>
-                        <td>@niveauxFr[item.NiveauJuridiction]</td>
-                        <td>@(villes.TryGetValue(item.IdVille, out var nomVille) ? nomVille : item.IdVille.ToString())</td>
-                        <td>
-                            @if (parents.TryGetValue(item.Id, out var nomParent) && nomParent is not null)
-                            {
-                                <span class="badge-parent-tribunal">@nomParent</span>
-                            }
-                            else
-                            {
-                                @:—
-                            }
-                        </td>
-                        <td>
-                            @if (item.IsActive)
-                            {
-                                <span class="badge-statut-pill green">Actif</span>
-                            }
-                            else
-                            {
-                                <span class="badge-statut-pill gray">Inactif</span>
-                            }
-                        </td>
-                        <td class="text-right">
-                            @if (item.IsActive)
-                            {
-                                <form method="post" asp-action="Disable" asp-route-id="@item.Id">
-                                    <button type="submit" class="btn-table-action danger">Désactiver</button>
-                                </form>
-                            }
-                            else
-                            {
-                                <form method="post" asp-action="Enable" asp-route-id="@item.Id">
-                                    <button type="submit" class="btn-table-action">Activer</button>
-                                </form>
-                            }
+                    <tr class="table-group-row">
+                        <td colspan="8">
+                            <div class="group-row-inner">
+                                <span class="group-badge">Ressort</span>
+                                <span class="group-title">@(groupe.Ressort?.NomTribunal ?? "Sans cour d'appel")</span>
+                                @if (groupe.Ressort is not null)
+                                {
+                                    <span class="group-meta">
+                                        @niveauxFr[groupe.Ressort.NiveauJuridiction]@(villes.TryGetValue(groupe.Ressort.IdVille, out var villeRessort) ? " · " + villeRessort : "")
+                                    </span>
+                                }
+                                <span class="group-count">@groupe.Items.Count juridiction(s)</span>
+                            </div>
                         </td>
                     </tr>
+                    @foreach (var item in groupe.Items)
+                    {
+                        <tr>
+                            <td>@item.NomTribunal</td>
+                            <td dir="rtl">@(string.IsNullOrWhiteSpace(item.NomTribunalAr) ? "—" : item.NomTribunalAr)</td>
+                            <td><span class="badge-type-tribunal">@typesFr[item.TypeTribunal]</span></td>
+                            <td>@niveauxFr[item.NiveauJuridiction]</td>
+                            <td>@(villes.TryGetValue(item.IdVille, out var nomVille) ? nomVille : item.IdVille.ToString())</td>
+                            <td>
+                                @if (parents.TryGetValue(item.Id, out var nomParent) && nomParent is not null)
+                                {
+                                    <span class="badge-parent-tribunal">@nomParent</span>
+                                }
+                                else
+                                {
+                                    @:—
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge-statut-pill green">Actif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-statut-pill gray">Inactif</span>
+                                }
+                            </td>
+                            <td class="text-right">
+                                @if (item.IsActive)
+                                {
+                                    <form method="post" asp-action="Disable" asp-route-id="@item.Id">
+                                        <button type="submit" class="btn-table-action danger">Désactiver</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form method="post" asp-action="Enable" asp-route-id="@item.Id">
+                                        <button type="submit" class="btn-table-action">Activer</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

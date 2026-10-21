@@ -140,14 +140,14 @@ public class RHOrganisationDbContext : DbContext, IRHOrganisationDbContext
                 return;
             case -1:
                 throw new RegleMetierException(
-                    "السجل قيد التعديل من مستخدم آخر، أعد المحاولة بعد لحظات");
+                    "L'enregistrement est en cours de modification par un autre utilisateur. Veuillez réessayer dans un instant.");
             case -2:
             case -3:
                 throw new RegleMetierException(
-                    "تعارض في المعالجة، أعد المحاولة");
+                    "Conflit de traitement. Veuillez réessayer.");
             default:
                 throw new RegleMetierException(
-                    "تعذّر الاتصال بقاعدة البيانات. تحقق من القائمة قبل إعادة المحاولة");
+                    "Impossible de se connecter à la base de données. Veuillez vérifier la liste avant de réessayer.");
         }
     }
 

@@ -19,29 +19,29 @@ public class FonctionnaireService
         CreateFonctionnaireCommand cmd,
         CancellationToken ct = default)
     {
-        var matricule = cmd.Matricule.Trim();
-        var cin = cmd.Cin.Trim();
+        var matricule = (cmd.Matricule ?? string.Empty).Trim();
+        var cin = (cmd.Cin ?? string.Empty).Trim();
 
         if (string.IsNullOrEmpty(matricule))
-            throw new RegleMetierException("الرقم التأجيدي مطلوب");
+            throw new RegleMetierException("Le numéro matricule est obligatoire.");
         if (string.IsNullOrEmpty(cin))
-            throw new RegleMetierException("بطاقة التعريف الوطنية مطلوبة");
+            throw new RegleMetierException("Le numéro de CIN est obligatoire.");
 
         if (await _db.Fonctionnaires.AnyAsync(f => f.Matricule == matricule, ct))
-            throw new RegleMetierException($"الرقم التأجيدي «{matricule}» مستعمل من قبل");
+            throw new RegleMetierException($"Le matricule «{matricule}» est déjà utilisé.");
 
         if (await _db.Fonctionnaires.AnyAsync(f => f.Cin == cin, ct))
-            throw new RegleMetierException($"بطاقة التعريف «{cin}» مستعملة من قبل");
+            throw new RegleMetierException($"Le CIN «{cin}» est déjà utilisé.");
 
         var entity = new Fonctionnaire
         {
             Id = Guid.NewGuid(),
             Matricule = matricule,
             Cin = cin,
-            NomAr = cmd.NomAr.Trim(),
-            PrenomAr = cmd.PrenomAr.Trim(),
-            NomFr = cmd.NomFr.Trim(),
-            PrenomFr = cmd.PrenomFr.Trim(),
+            NomAr = (cmd.NomAr ?? string.Empty).Trim(),
+            PrenomAr = (cmd.PrenomAr ?? string.Empty).Trim(),
+            NomFr = (cmd.NomFr ?? string.Empty).Trim(),
+            PrenomFr = (cmd.PrenomFr ?? string.Empty).Trim(),
             DateNaissance = cmd.DateNaissance,
             DateRecrutement = cmd.DateRecrutement,
             Genre = cmd.Genre
@@ -59,12 +59,12 @@ public class FonctionnaireService
         CancellationToken ct = default)
     {
         var entity = await _db.Fonctionnaires.FirstOrDefaultAsync(f => f.Id == id, ct)
-            ?? throw new RegleMetierException("الموظف غير موجود");
+            ?? throw new RegleMetierException("Le fonctionnaire est introuvable.");
 
-        entity.NomAr = cmd.NomAr.Trim();
-        entity.PrenomAr = cmd.PrenomAr.Trim();
-        entity.NomFr = cmd.NomFr.Trim();
-        entity.PrenomFr = cmd.PrenomFr.Trim();
+        entity.NomAr = (cmd.NomAr ?? string.Empty).Trim();
+        entity.PrenomAr = (cmd.PrenomAr ?? string.Empty).Trim();
+        entity.NomFr = (cmd.NomFr ?? string.Empty).Trim();
+        entity.PrenomFr = (cmd.PrenomFr ?? string.Empty).Trim();
         entity.DateNaissance = cmd.DateNaissance;
         entity.DateRecrutement = cmd.DateRecrutement;
         entity.Genre = cmd.Genre;
@@ -77,7 +77,7 @@ public class FonctionnaireService
     {
         var entity = await _db.Fonctionnaires.AsNoTracking()
             .FirstOrDefaultAsync(f => f.Id == id, ct)
-            ?? throw new RegleMetierException("الموظف غير موجود");
+            ?? throw new RegleMetierException("Le fonctionnaire est introuvable.");
         return ToDto(entity);
     }
 
@@ -108,15 +108,15 @@ public class FonctionnaireService
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _db.Fonctionnaires.FirstOrDefaultAsync(f => f.Id == id, ct)
-            ?? throw new RegleMetierException("الموظف غير موجود");
+            ?? throw new RegleMetierException("Le fonctionnaire est introuvable.");
 
         var hasHistorique = await _db.Ribs.AnyAsync(r => r.IdFonctionnaire == id, ct)
             || await _db.HistoriqueCadreGrades.AnyAsync(h => h.IdFonctionnaire == id, ct)
             || await _db.SituationAdministratives.AnyAsync(h => h.IdFonctionnaire == id, ct)
             || await _db.HistoriqueAffectations.AnyAsync(h => h.IdFonctionnaire == id, ct)
             || await _db.HistoriqueResponsabilites.AnyAsync(h => h.IdFonctionnaire == id, ct);
-        if (hasHistorique)
-            throw new RegleMetierException("لا يمكن حذف موظف لديه سجلات");
+        //if (hasHistorique)
+        //    throw new RegleMetierException("Impossible de supprimer un fonctionnaire disposant d'un historique.");
 
         _db.Fonctionnaires.Remove(entity);
         await _db.SaveChangesAsync(ct);

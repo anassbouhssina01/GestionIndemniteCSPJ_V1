@@ -33,13 +33,13 @@ public class PieceJointeService
         CancellationToken ct = default)
     {
         if (fileStream.Length > MaxFileSize)
-            throw new RegleMetierException("حجم الملف يتجاوز 10 ميغا");
+            throw new RegleMetierException("La taille du fichier dépasse 10 Mo.");
 
         var header = new byte[4];
         var read = await fileStream.ReadAsync(header.AsMemory(0, 4), ct);
         if (read < 4 || header[0] != (byte)'%' || header[1] != (byte)'P'
             || header[2] != (byte)'D' || header[3] != (byte)'F')
-            throw new RegleMetierException("الملف ليس بصيغة PDF صحيحة");
+            throw new RegleMetierException("Le fichier n'est pas un PDF valide.");
 
         fileStream.Position = 0;
 
@@ -63,7 +63,7 @@ public class PieceJointeService
         if (existing is not null)
         {
             throw new RegleMetierException(
-                $"المستند موجود مسبقاً: {existing.NumeroDocument} — {existing.Emetteur} ({existing.AnneeDocument})");
+                $"Le document existe déjà : {existing.NumeroDocument} — {existing.Emetteur} ({existing.AnneeDocument})");
         }
 
         var storedName = await _storage.SaveAsync(fileStream, $"{numeroNormalise}.pdf", ct);
@@ -71,15 +71,15 @@ public class PieceJointeService
         var entity = new PieceJointe
         {
             Id = Guid.NewGuid(),
-            NumeroDocument = cmd.NumeroDocument.Trim(),
+            NumeroDocument = (cmd.NumeroDocument ?? string.Empty).Trim(),
             NumeroDocumentNormalise = numeroNormalise,
             DateDocument = cmd.DateDocument,
             AnneeDocument = cmd.DateDocument.Year,
-            Emetteur = cmd.Emetteur.Trim(),
+            Emetteur = (cmd.Emetteur ?? string.Empty).Trim(),
             EmetteurNormalise = emetteurNormalise,
-            TypeDocument = cmd.TypeDocument.Trim(),
-            Objet = cmd.Objet.Trim(),
-            NomFichier = $"{cmd.NumeroDocument.Trim()}.pdf",
+            TypeDocument = (cmd.TypeDocument ?? string.Empty).Trim(),
+            Objet = (cmd.Objet ?? string.Empty).Trim(),
+            NomFichier = $"{(cmd.NumeroDocument ?? string.Empty).Trim()}.pdf",
             CheminFichier = storedName,
             HashFichier = hash,
             DateAjout = DateOnly.FromDateTime(DateTime.UtcNow)
@@ -105,10 +105,10 @@ public class PieceJointeService
     {
         var entity = await _db.PieceJointes.AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == id, ct)
-            ?? throw new RegleMetierException("المستند غير موجود");
+            ?? throw new RegleMetierException("Le document est introuvable.");
 
         if (entity.CheminFichier is null)
-            throw new RegleMetierException("ملف هذا المستند غير متوفر");
+            throw new RegleMetierException("Le fichier de ce document n'est pas disponible.");
 
         return await _storage.OpenReadAsync(entity.CheminFichier, ct);
     }
@@ -117,14 +117,14 @@ public class PieceJointeService
     {
         var entity = await _db.PieceJointes.AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == id, ct)
-            ?? throw new RegleMetierException("المستند غير موجود");
+            ?? throw new RegleMetierException("Le document est introuvable.");
         return ToDto(entity);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _db.PieceJointes.FirstOrDefaultAsync(p => p.Id == id, ct)
-            ?? throw new RegleMetierException("المستند غير موجود");
+            ?? throw new RegleMetierException("Le document est introuvable.");
 
         var utilise = await _db.HistoriqueCadreGrades.AnyAsync(h => h.IdDocument == id, ct)
             || await _db.SituationAdministratives.AnyAsync(h => h.IdDocument == id, ct)
@@ -133,7 +133,7 @@ public class PieceJointeService
             || await _db.HistoriqueOrganigrammeTribunalSet.AnyAsync(h => h.IdDocument == id, ct)
             || await _db.HistoriqueOrganigrammeUniteSet.AnyAsync(h => h.IdDocument == id, ct);
         if (utilise)
-            throw new RegleMetierException("لا يمكن حذف مستند مرتبط بسجل");
+            throw new RegleMetierException("Impossible de supprimer un document lié à un enregistrement.");
 
         _db.PieceJointes.Remove(entity);
         await _db.SaveChangesAsync(ct);

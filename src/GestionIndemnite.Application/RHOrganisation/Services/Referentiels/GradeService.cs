@@ -18,20 +18,20 @@ public class GradeService
     public async Task<GradeDto> CreateAsync(CreateGradeCommand cmd, CancellationToken ct = default)
     {
         var cadre = await _db.Cadres.FirstOrDefaultAsync(c => c.Id == cmd.IdCadre, ct)
-            ?? throw new RegleMetierException("الإطار غير موجود");
+            ?? throw new RegleMetierException("Le cadre est introuvable.");
 
         if (await _db.Grades.AnyAsync(
                 g => g.IdCadre == cadre.Id && g.NumeroReferencie == cmd.NumeroReferencie, ct))
             throw new RegleMetierException(
-                $"الرقم المرجعي {cmd.NumeroReferencie} مستعمل داخل هذا الإطار");
+                $"La référence {cmd.NumeroReferencie} est déjà utilisée dans ce cadre.");
 
         var grade = new Grade
         {
             Id = Guid.NewGuid(),
             IdCadre = cadre.Id,
             NumeroReferencie = cmd.NumeroReferencie,
-            LibelleGradeAr = cmd.LibelleGradeAr.Trim(),
-            LibelleGradeFr = cmd.LibelleGradeFr.Trim(),
+            LibelleGradeAr = (cmd.LibelleGradeAr ?? string.Empty).Trim(),
+            LibelleGradeFr = (cmd.LibelleGradeFr ?? string.Empty).Trim(),
             Description = cmd.Description?.Trim()
         };
 
@@ -44,26 +44,26 @@ public class GradeService
     public async Task<GradeDto> UpdateAsync(Guid id, UpdateGradeCommand cmd, CancellationToken ct = default)
     {
         var grade = await _db.Grades.FirstOrDefaultAsync(g => g.Id == id, ct)
-            ?? throw new RegleMetierException("الرتبة غير موجودة");
+            ?? throw new RegleMetierException("L'échelon est introuvable.");
 
         if (await _db.Grades.AnyAsync(
                 g => g.IdCadre == grade.IdCadre
                   && g.NumeroReferencie == cmd.NumeroReferencie
                   && g.Id != id, ct))
             throw new RegleMetierException(
-                $"الرقم المرجعي {cmd.NumeroReferencie} مستعمل داخل هذا الإطار");
+                $"La référence {cmd.NumeroReferencie} est déjà utilisée dans ce cadre.");
 
         if (grade.NumeroReferencie != cmd.NumeroReferencie
             && await _db.HistoriqueCadreGrades.AnyAsync(h => h.IdGrade == id, ct))
-            throw new RegleMetierException("لا يمكن تغيير الرقم المرجعي لرتبة مستعملة في السجلات");
+            throw new RegleMetierException("Impossible de modifier la référence d'un échelon utilisé dans les dossiers.");
 
         if (grade.EstActif && !cmd.EstActif
             && await _db.HistoriqueCadreGrades.AnyAsync(h => h.IdGrade == id, ct))
-            throw new RegleMetierException("لا يمكن تعطيل رتبة مستعملة في السجلات");
+            throw new RegleMetierException("Impossible de désactiver un échelon utilisé dans les dossiers.");
 
         grade.NumeroReferencie = cmd.NumeroReferencie;
-        grade.LibelleGradeAr = cmd.LibelleGradeAr.Trim();
-        grade.LibelleGradeFr = cmd.LibelleGradeFr.Trim();
+        grade.LibelleGradeAr = (cmd.LibelleGradeAr ?? string.Empty).Trim();
+        grade.LibelleGradeFr = (cmd.LibelleGradeFr ?? string.Empty).Trim();
         grade.Description = cmd.Description?.Trim();
         grade.EstActif = cmd.EstActif;
 
@@ -74,7 +74,7 @@ public class GradeService
     public async Task<GradeDto> GetAsync(Guid id, CancellationToken ct = default)
     {
         var grade = await _db.Grades.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id, ct)
-            ?? throw new RegleMetierException("الرتبة غير موجودة");
+            ?? throw new RegleMetierException("L'échelon est introuvable.");
         return ToDto(grade);
     }
 
@@ -96,10 +96,10 @@ public class GradeService
     public async Task DisableAsync(Guid id, CancellationToken ct = default)
     {
         var grade = await _db.Grades.FirstOrDefaultAsync(g => g.Id == id, ct)
-            ?? throw new RegleMetierException("الرتبة غير موجودة");
+            ?? throw new RegleMetierException("L'échelon est introuvable.");
 
         if (await _db.HistoriqueCadreGrades.AnyAsync(h => h.IdGrade == id, ct))
-            throw new RegleMetierException("لا يمكن تعطيل رتبة مستعملة في السجلات");
+            throw new RegleMetierException("Impossible de désactiver un échelon utilisé dans les dossiers.");
 
         grade.EstActif = false;
         await _db.SaveChangesAsync(ct);
@@ -108,7 +108,7 @@ public class GradeService
     public async Task EnableAsync(Guid id, CancellationToken ct = default)
     {
         var grade = await _db.Grades.FirstOrDefaultAsync(g => g.Id == id, ct)
-            ?? throw new RegleMetierException("الرتبة غير موجودة");
+            ?? throw new RegleMetierException("L'échelon est introuvable.");
         grade.EstActif = true;
         await _db.SaveChangesAsync(ct);
     }

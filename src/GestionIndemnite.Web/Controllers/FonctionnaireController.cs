@@ -80,7 +80,7 @@ public class FonctionnaireController : Controller
     public async Task<IActionResult> Create(CreateFonctionnaireCommand command, CancellationToken ct)
     {
         var fonctionnaire = await _service.CreateAsync(command, ct);
-        TempData["Succes"] = "Le fonctionnaire a Ã©tÃ© crÃ©Ã©.";
+        TempData["Succes"] = "Le fonctionnaire a été créé.";
         return RedirectToAction(nameof(Details), new { id = fonctionnaire.Id });
     }
 
@@ -125,7 +125,7 @@ public class FonctionnaireController : Controller
     public async Task<IActionResult> Edit(Guid id, UpdateFonctionnaireCommand command, CancellationToken ct)
     {
         await _service.UpdateAsync(id, command, ct);
-        TempData["Succes"] = "Le fonctionnaire a Ã©tÃ© mis Ã  jour.";
+        TempData["Succes"] = "Le fonctionnaire a été mis à jour.";
         return RedirectToAction(nameof(Details), new { id });
     }
 
@@ -134,7 +134,7 @@ public class FonctionnaireController : Controller
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         await _service.DeleteAsync(id, ct);
-        TempData["Succes"] = "Le fonctionnaire a Ã©tÃ© supprimÃ©.";
+        TempData["Succes"] = "Le fonctionnaire a été supprimé.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -159,7 +159,7 @@ public class FonctionnaireController : Controller
         CancellationToken ct)
     {
         await _gradePeriods.ChangeAsync(id, idGrade, dateDebut, idDocument, ct);
-        TempData["Succes"] = "Le grade a Ã©tÃ© changÃ© et l'ancienne pÃ©riode a Ã©tÃ© clÃ´turÃ©e.";
+        TempData["Succes"] = "Le grade a été changé et l'ancienne période a été clôturée.";
         return RedirectToAction(nameof(Details), controllerName: null, routeValues: new { id }, fragment: "tab-grade");
     }
 
@@ -173,7 +173,7 @@ public class FonctionnaireController : Controller
         CancellationToken ct)
     {
         await _situationPeriods.ChangeAsync(id, idStatut, dateDebut, idDocument, ct);
-        TempData["Succes"] = "La situation administrative a Ã©tÃ© changÃ©e.";
+        TempData["Succes"] = "La situation administrative a été changée.";
         return RedirectToAction(nameof(Details), controllerName: null, routeValues: new { id }, fragment: "tab-situation");
     }
 
@@ -193,7 +193,7 @@ public class FonctionnaireController : Controller
             id, idTribunalAffectation, idUniteAffectation, idUniteTravail,
             sectionTribunal, dateDebut, idDocument, ct);
 
-        TempData["Succes"] = "L'affectation a Ã©tÃ© changÃ©e et l'ancienne pÃ©riode a Ã©tÃ© clÃ´turÃ©e.";
+        TempData["Succes"] = "L'affectation a été changée et l'ancienne période a été clôturée.";
         return RedirectToAction(nameof(Details), controllerName: null, routeValues: new { id }, fragment: "tab-affectation");
     }
 
@@ -213,7 +213,7 @@ public class FonctionnaireController : Controller
             id, idResponsabilite, idTribunal, idUniteOrganisationnelle,
             dateDebut, dateFin, idDocument), ct);
 
-        TempData["Succes"] = "La responsabilitÃ© a Ã©tÃ© attribuÃ©e.";
+        TempData["Succes"] = "La responsabilité a été attribuée.";
         return RedirectToAction(nameof(Details), controllerName: null, routeValues: new { id }, fragment: "tab-responsabilites");
     }
 
@@ -226,7 +226,7 @@ public class FonctionnaireController : Controller
         CancellationToken ct)
     {
         await _responsabilitePeriods.CloseAsync(idPeriode, dateFin, ct);
-        TempData["Succes"] = "La responsabilitÃ© a Ã©tÃ© clÃ´turÃ©e.";
+        TempData["Succes"] = "La responsabilité a été clôturée.";
         return RedirectToAction(nameof(Details), controllerName: null, routeValues: new { id }, fragment: "tab-responsabilites");
     }
 
@@ -234,6 +234,6 @@ public class FonctionnaireController : Controller
         new(new[]
         {
             new SelectListItem("Masculin", "0"),
-            new SelectListItem("FÃ©minin", "1")
+            new SelectListItem("Féminin", "1")
         }, "Value", "Text");
 }

@@ -28,17 +28,17 @@ public class HistoriqueOrganigrammeTribunalService
     {
         var tribunal = await _db.Tribunaux
             .FirstOrDefaultAsync(t => t.Id == idTribunal, ct)
-            ?? throw new RegleMetierException("المحكمة غير موجودة");
+            ?? throw new RegleMetierException("Le tribunal est introuvable.");
 
         NiveauJuridiction? parentLevel = null;
         if (cmd.IdTribunalParent.HasValue)
         {
             if (cmd.IdTribunalParent == idTribunal)
-                throw new RegleMetierException("المحكمة لا يمكن أن تكون تابعة لنفسها");
+                throw new RegleMetierException("Un tribunal ne peut pas être rattaché à lui-même.");
 
             var parent = await _db.Tribunaux
                 .FirstOrDefaultAsync(t => t.Id == cmd.IdTribunalParent.Value, ct)
-                ?? throw new RegleMetierException("المحكمة الأم غير موجودة");
+                ?? throw new RegleMetierException("Le tribunal parent est introuvable.");
             parentLevel = parent.NiveauJuridiction;
         }
 
@@ -46,11 +46,11 @@ public class HistoriqueOrganigrammeTribunalService
 
         if (await IsCycleAsync(idTribunal, cmd.IdTribunalParent, cmd.DateDebut, ct))
             throw new RegleMetierException(
-                "تمييز في الهيكلة: المحكمة لا يمكن أن تكون تابعة لمن هو تابع لها");
+                "Incohérence hiérarchique : un tribunal ne peut pas être rattaché à l'un de ses tribunaux subordonnés.");
 
         if (cmd.IdDocument.HasValue &&
             !await _db.PieceJointes.AnyAsync(p => p.Id == cmd.IdDocument.Value, ct))
-            throw new RegleMetierException("المستند غير موجود");
+            throw new RegleMetierException("Le document est introuvable.");
 
         var entity = new HistoriqueOrganigrammeTribunal
         {
@@ -152,25 +152,25 @@ public class HistoriqueOrganigrammeUniteService
     {
         var unite = await _db.UnitesOrganisationnelles
             .FirstOrDefaultAsync(u => u.Id == idUnite, ct)
-            ?? throw new RegleMetierException("الهيكل غير موجود");
+            ?? throw new RegleMetierException("L'unité organisationnelle est introuvable.");
 
         if (cmd.IdUniteParent.HasValue)
         {
             if (cmd.IdUniteParent == idUnite)
-                throw new RegleMetierException("الهيكل لا يمكن أن يكون تابعا لنفسه");
+                throw new RegleMetierException("Une unité ne peut pas être rattachée à elle-même.");
 
             if (!await _db.UnitesOrganisationnelles.AnyAsync(
                     u => u.Id == cmd.IdUniteParent.Value, ct))
-                throw new RegleMetierException("الهيكل الأب غير موجود");
+                throw new RegleMetierException("L'unité organisationnelle parente est introuvable.");
         }
 
         if (await IsCycleAsync(idUnite, cmd.IdUniteParent, cmd.DateDebut, ct))
             throw new RegleMetierException(
-                "تمييز في الهيكلة: الهيكل لا يمكن أن يكون تابعا لمن هو تابع له");
+                "Incohérence hiérarchique : une unité ne peut pas être rattachée à l'une de ses unités subordonnées.");
 
         if (cmd.IdDocument.HasValue &&
             !await _db.PieceJointes.AnyAsync(p => p.Id == cmd.IdDocument.Value, ct))
-            throw new RegleMetierException("المستند غير موجود");
+            throw new RegleMetierException("Le document est introuvable.");
 
         var entity = new HistoriqueOrganigrammeUnite
         {

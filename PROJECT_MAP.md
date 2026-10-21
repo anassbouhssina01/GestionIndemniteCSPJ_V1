@@ -1,7 +1,7 @@
 # PROJECT_MAP — GestionIndemnite / RHOrganisation
 
 > External memory. Update on every architecture change. Read before touching any file.
-> Last sync: 2026-10-19 — M11 complete (162 tests green, smoke test UI OK).
+> Last sync: 2026-10-21 — M14 (exceptions en popup/toast FR, 168 tests verts, smoke test UI OK).
 
 ## [TECH_STACK]
 
@@ -14,7 +14,7 @@
 - xunit 2.9.3 + Microsoft.NET.Test.Sdk 18.11.0
 - System.Security.Cryptography.Pkcs 10.0.13 (pin — corrige NU1902/NU1903 de EF SqlServer)
 - Logging : `ILogger` + `AsyncFileLoggerProvider` (BCL Channel + BackgroundService, 3 niveaux, drop si plein). Zéro framework externe.
-- UI (décidé) : MVC / Razor Pages, libellés **français**, messages `RegleMetierException` **arabe** (mandat 11.2.9)
+- UI (décidé) : MVC / Razor Pages, libellés **français**, messages `RegleMetierException` **français** (mandat 11.2.9 révisé le 2026-10-21 : exceptions + popup)
 - Pas de Serilog, pas de Repository/UoW, pas de InMemory/Mock dans les tests
 
 ## [SYSTEM_FLOW]
@@ -28,7 +28,7 @@ Referentiels(6 CRUD) → PieceJointe(PDF %PDF ≤10Mo SHA-256)
     [AcquireKeyLockAsync(sp_getapplock) : implémenté, activé APRÈS test témoin M5]
 → Rapports(trous / sans-justificatif / contrôle-overlap)
 → Import Excel(dry-run → rapport erreurs → 1 txn/fonctionnaire → mêmes services)
-UI MVC(FR) → Controllers minces → Services → DTOs. Messages métier AR dans bandeau d'erreur.
+UI MVC(FR) → Controllers minces → Services → DTOs. Messages métier FR affichés en toast (popup).
 ```
 
 ## [ARCHITECTURE]
@@ -52,7 +52,7 @@ Tests (→ les 4 + xunit + SqlServer)
 - Audit/soft-delete dans `RHOrganisationDbContext.SaveChangesAsync` : Added→CreatedAt/By, Modified→UpdatedAt/By, Deleted→IsDeleted=true (state→Modified)
 - Query filter `IsDeleted=false` : déclaré **par entité** dans `OnModelCreating` (pattern type-safe EF Core — chaque nouvelle entité ajoute sa ligne)
 - Schéma `rh`, UX uniques filtrés `[IsDeleted]=0`, FK Restrict, Enums nombres, DateOnly
-- `AcquireKeyLockAsync` : ADO.NET direct (sp_getapplock, @LockOwner=Transaction), retour 0/1=ok, -1→RegleMetierException AR, -2/-3→retry, default→generic
+- `AcquireKeyLockAsync` : ADO.NET direct (sp_getapplock, @LockOwner=Transaction), retour 0/1=ok, -1→RegleMetierException FR, -2/-3→retry, default→generic
 - `BeginTransactionAsync(IsolationLevel)` : délègue à `Database.BeginTransactionAsync`
 - Services (M2+) : classes concettes injectant `IRHOrganisationDbContext`, retournent DTOs, jamais d'entités
 
@@ -74,6 +74,7 @@ Tests (→ les 4 + xunit + SqlServer)
 | M12 Écrans historiques | ⬜ | 6 formulaires période |
 | M12 Écrans historiques | ⬜ | 6 formulaires période |
 | M13 Rapports+Import UI | ⬜ | 3 rapports + écran import |
+| M14 Exceptions en popup | ✅ 2026-10-21 | RegleMetierExceptionFilter global (toute exception → `TempData["Erreur"]` → toast), 141 messages métier AR → **FR**, toast (`_Notification` + `#toast-container` + `theme.js` + CSS) auto-fermeture 5 s (clic sur le toast = inerte, seul ✕ ferme), modales dossier agent: `stopPropagation` sur `.modal-dialog` (ne se ferment plus au clic interne), 43 `cmd.X.Trim()` → `(cmd.X ?? string.Empty).Trim()` (NRE sur champ vide), 168 tests verts |
 
 ## [ORPHANS & PENDING]
 
@@ -83,7 +84,7 @@ Tests (→ les 4 + xunit + SqlServer)
 ## [RESOLVED DECISIONS]
 
 - UI = MVC/Razor Pages, FR only (choix utilisateur 2026-10-19)
-- Messages RegleMetierException = arabe (mandat document 11.2.9), affichés dans bandeau d'erreur
+- Messages RegleMetierException = **français** (mandat 11.2.9 révisé 2026-10-21), affichés en **toast/popup** (pas de bandeau)
 - Tâche 1 reconstruite de zéro (repo vide)
 - 12.10 n°1,3,4,5,6 : adoptés les 6 par défaut
 - Cadre reshufflé M2→M1 (audit tests sur vraie table, pas d'entité test)

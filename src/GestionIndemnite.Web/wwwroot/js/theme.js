@@ -3,6 +3,27 @@
 (function () {
     "use strict";
 
+    function showToast(message, type) {
+        if (!message) return;
+        var container = document.getElementById('toast-container');
+        if (!container) return;
+        var toast = document.createElement('div');
+        toast.className = 'toast' + (type === 'success' ? ' toast-success' : ' toast-error');
+        toast.innerHTML = '<span class="toast-message"></span><button type="button" class="toast-close" aria-label="Fermer">&times;</button>';
+        var msgEl = toast.querySelector('.toast-message');
+        if (msgEl) msgEl.textContent = message;
+        container.appendChild(toast);
+        requestAnimationFrame(function () { toast.classList.add('show'); });
+        var closeBtn = toast.querySelector('.toast-close');
+        function hide() {
+            if (toast.classList.contains('hiding')) return;
+            toast.classList.add('hiding');
+            setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+        }
+        // La notification reste affichée : seul le bouton "×" la ferme.
+        if (closeBtn) closeBtn.addEventListener('click', hide);
+    }
+
     function ready(fn) {
         if (document.readyState !== "loading") {
             fn();
@@ -12,6 +33,15 @@
     }
 
     ready(function () {
+        try {
+            var successInput = document.getElementById('toast-data-success');
+            if (successInput && successInput.value) { showToast(successInput.value, 'success'); }
+        } catch (e) { }
+        try {
+            var errorInput = document.getElementById('toast-data-error');
+            if (errorInput && errorInput.value) { showToast(errorInput.value, 'error'); }
+        } catch (e) { }
+
         var sidebar = document.getElementById("sidebar");
         var wrapper = document.getElementById("main-wrapper");
         var toggle = document.getElementById("btn-toggle-sidebar");

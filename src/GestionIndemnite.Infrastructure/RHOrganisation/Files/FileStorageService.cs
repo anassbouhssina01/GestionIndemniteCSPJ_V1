@@ -1,4 +1,5 @@
 using GestionIndemnite.Application.RHOrganisation.Common;
+using GestionIndemnite.Domain.RHOrganisation.Exceptions;
 using Microsoft.Extensions.Logging;
 
 namespace GestionIndemnite.Infrastructure.RHOrganisation.Files;
@@ -33,7 +34,7 @@ public class FileStorageService : IFileStorage
         var fullPath = Path.Combine(_rootPath, safeName);
 
         if (!File.Exists(fullPath))
-            throw new FileNotFoundException("الملف غير موجود", safeName);
+            throw new RegleMetierException("Le fichier est introuvable.");
 
         return Task.FromResult<Stream>(File.OpenRead(fullPath));
     }

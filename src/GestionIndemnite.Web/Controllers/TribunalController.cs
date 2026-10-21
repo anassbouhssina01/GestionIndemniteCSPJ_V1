@@ -40,25 +40,110 @@ public class TribunalController : Controller
         _villes = villes;
     }
 
-    public async Task<IActionResult> Index(bool inactifs = false, CancellationToken ct = default)
+    public async Task<IActionResult> Index(
+        bool inactifs = false,
+        string? nom = null,
+        TypeTribunal? type = null,
+        NiveauJuridiction? niveau = null,
+        Guid? idVille = null,
+        Guid? idRessort = null,
+        CancellationToken ct = default)
     {
-        var tribunaux = await _service.ListAsync(inactifs, ct);
+        var tous = await _service.ListAsync(true, ct);
         var villes = await _villes.ListAsync(null, true, ct);
+        var byId = tous.ToDictionary(t => t.Id);
+
+        var parentIds = new Dictionary<Guid, Guid?>();
+        foreach (var tribunal in tous)
+        {
+            var parent = await _service.GetParentAtAsync(tribunal.Id, null, ct);
+            parentIds[tribunal.Id] = parent?.Id;
+        }
+
+        var ressorts = tous.ToDictionary(
+            t => t.Id,
+            t => ResoudreRessortId(t.Id, byId, parentIds));
+
+        var liste = tous.Where(t => inactifs || t.IsActive);
+
+        if (!string.IsNullOrWhiteSpace(nom))
+        {
+            var terme = nom.Trim();
+            liste = liste.Where(t =>
+                t.NomTribunal.Contains(terme, StringComparison.OrdinalIgnoreCase)
+                || (t.NomTribunalAr ?? string.Empty).Contains(terme, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (type.HasValue)
+        {
+            var valeur = type.Value;
+            liste = liste.Where(t => t.TypeTribunal == valeur);
+        }
+
+        if (niveau.HasValue)
+        {
+            var valeur = niveau.Value;
+            liste = liste.Where(t => t.NiveauJuridiction == valeur);
+        }
+
+        if (idVille.HasValue)
+        {
+            var valeur = idVille.Value;
+            liste = liste.Where(t => t.IdVille == valeur);
+        }
+
+        if (idRessort.HasValue)
+        {
+            var valeur = idRessort.Value;
+            liste = liste.Where(t => ressorts[t.Id] == valeur);
+        }
+
+        var resultat = liste.ToList();
 
         ViewBag.Inactifs = inactifs;
+        ViewBag.Nom = nom;
+        ViewBag.TypeFiltre = type;
+        ViewBag.NiveauFiltre = niveau;
+        ViewBag.IdVilleFiltre = idVille;
+        ViewBag.IdRessortFiltre = idRessort;
         ViewBag.Villes = villes.ToDictionary(v => v.Id, v => v.NomVille);
         ViewBag.TypesFr = TypesFr;
         ViewBag.NiveauxFr = NiveauxFr;
+        ViewBag.ById = byId;
+        ViewBag.Ressorts = ressorts;
 
         var parents = new Dictionary<Guid, string?>();
-        foreach (var tribunal in tribunaux)
+        foreach (var kv in parentIds)
         {
-            var parent = await _service.GetParentAtAsync(tribunal.Id, null, ct);
-            parents[tribunal.Id] = parent?.Nom;
+            parents[kv.Key] = kv.Value is Guid parentId && byId.TryGetValue(parentId, out var parent)
+                ? parent.NomTribunal
+                : null;
         }
         ViewBag.Parents = parents;
 
-        return View(tribunaux);
+        return View(resultat);
+    }
+
+    private static Guid? ResoudreRessortId(
+        Guid id,
+        IReadOnlyDictionary<Guid, TribunalDto> byId,
+        IReadOnlyDictionary<Guid, Guid?> parentIds)
+    {
+        var courant = id;
+        var vus = new HashSet<Guid>();
+
+        while (vus.Add(courant) && byId.TryGetValue(courant, out var tribunal))
+        {
+            if (tribunal.NiveauJuridiction is NiveauJuridiction.CA or NiveauJuridiction.Cassation)
+                return tribunal.Id;
+
+            if (!parentIds.TryGetValue(courant, out var parentId) || parentId is null)
+                return null;
+
+            courant = parentId.Value;
+        }
+
+        return null;
     }
 
     public async Task<IActionResult> Create(CancellationToken ct)

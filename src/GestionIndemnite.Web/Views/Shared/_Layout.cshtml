@@ -58,7 +58,7 @@
                     </li>
                 </ul>
 
-                <div class="nav-section-title">GESTION FONCTIONNAIRE</div>
+                @* <div class="nav-section-title">GESTION FONCTIONNAIRE</div> *@
                 <ul class="nav-list">
                     <li>
                         <a class="@NavClass("Fonctionnaire")" asp-controller="Fonctionnaire" asp-action="Index">
@@ -73,7 +73,7 @@
                     </li>
                 </ul>
 
-                <div class="nav-section-title">BUREAU D'ORDRE</div>
+                @* <div class="nav-section-title">BUREAU D'ORDRE</div> *@
                 <ul class="nav-list">
                     <li>
                         <a class="@NavClass("PieceJointe")" asp-controller="PieceJointe" asp-action="Index">
@@ -86,7 +86,7 @@
                     </li>
                 </ul>
 
-                <div class="nav-section-title">PARAMÉTRAGE</div>
+                @* <div class="nav-section-title">PARAMÉTRAGE</div> *@
                 <ul class="nav-list">
                     <li class="nav-group-parent">
                         <button type="button" class="nav-item nav-parent-item @referentielsOpen" data-submenu-toggle="#submenu-parametrage">
@@ -144,7 +144,7 @@
                     </li>
                 </ul>
 
-                <div class="nav-section-title">HISTORIQUES</div>
+                @* <div class="nav-section-title">HISTORIQUES</div>
                 <ul class="nav-list">
                     <li class="nav-group-parent">
                         <button type="button" class="nav-item nav-parent-item @historiquesOpen" data-submenu-toggle="#submenu-historiques">
@@ -189,10 +189,10 @@
                                 </a>
                             </li>
                         </ul>
-                    </li>
-                </ul>
+                    </li> *@
+                @* </ul> *@
 
-                <div class="nav-section-title">RAPPORTS &amp; IMPORT</div>
+                @* <div class="nav-section-title">RAPPORTS &amp; IMPORT</div> *@
                 <ul class="nav-list">
                     <li class="nav-group-parent">
                         <button type="button" class="nav-item nav-parent-item @rapportsOpen" data-submenu-toggle="#submenu-rapports">
@@ -277,12 +277,13 @@
                 </div>
             </header>
 
-            <main class="content-area" id="main-content">
-                <section class="app-view active">
-                    <partial name="_ErrorBanner" />
-                    @RenderBody()
-                </section>
-            </main>
+<main class="content-area" id="main-content">
+        <section class="app-view active">
+            <partial name="_Notification" />
+            <div id="toast-container" class="toast-container"></div>
+            @RenderBody()
+        </section>
+    </main>
         </div>
     </div>
 

@@ -344,7 +344,9 @@ public class PeriodeServiceTests
         var ex = await Assert.ThrowsAsync<RegleMetierException>(
             () => contextB.AcquireKeyLockAsync(lockKey));
 
-        Assert.Equal("السجل قيد التعديل من مستخدم آخر، أعد المحاولة بعد لحظات", ex.Message);
+        Assert.Equal(
+            "L'enregistrement est en cours de modification par un autre utilisateur. Veuillez réessayer dans un instant.",
+            ex.Message);
 
         await txnA.CommitAsync();
     }
