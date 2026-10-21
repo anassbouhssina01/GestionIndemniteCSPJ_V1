@@ -25,6 +25,13 @@ public class TribunalService
         if (string.IsNullOrEmpty(nom))
             throw new RegleMetierException("Le nom du tribunal est obligatoire.");
 
+        var numero = (cmd.NumeroTribunal ?? string.Empty).Trim();
+        if (numero.Length > 50)
+            throw new RegleMetierException("Le numéro du tribunal ne peut pas dépasser 50 caractères.");
+        if (!string.IsNullOrEmpty(numero) &&
+            await _db.Tribunaux.AnyAsync(t => t.NumeroTribunal == numero, ct))
+            throw new RegleMetierException($"Le numéro de tribunal «{numero}» est déjà utilisé.");
+
         NiveauJuridiction? parentLevel = null;
         if (cmd.IdTribunalParent.HasValue)
         {
@@ -43,11 +50,13 @@ public class TribunalService
         var tribunal = new Tribunal
         {
             Id = Guid.NewGuid(),
+            NumeroTribunal = numero,
             NomTribunal = nom,
             NomTribunalAr = (cmd.NomTribunalAr ?? string.Empty).Trim(),
             TypeTribunal = cmd.TypeTribunal,
             NiveauJuridiction = cmd.NiveauJuridiction,
             IdVille = cmd.IdVille,
+            DateCreation = cmd.DateCreation ?? DateOnly.FromDateTime(DateTime.UtcNow),
             IsActive = true
         };
 
@@ -154,7 +163,42 @@ public class TribunalService
         return false;
     }
 
+    public async Task<TribunalDto> UpdateAsync(
+        Guid id,
+        UpdateTribunalCommand cmd,
+        CancellationToken ct = default)
+    {
+        var tribunal = await _db.Tribunaux.FirstOrDefaultAsync(t => t.Id == id, ct)
+            ?? throw new RegleMetierException("Le tribunal est introuvable.");
+
+        var nom = (cmd.NomTribunal ?? string.Empty).Trim();
+        if (string.IsNullOrEmpty(nom))
+            throw new RegleMetierException("Le nom du tribunal est obligatoire.");
+
+        var numero = (cmd.NumeroTribunal ?? string.Empty).Trim();
+        if (numero.Length > 50)
+            throw new RegleMetierException("Le numéro du tribunal ne peut pas dépasser 50 caractères.");
+        if (!string.IsNullOrEmpty(numero) &&
+            await _db.Tribunaux.AnyAsync(t => t.NumeroTribunal == numero && t.Id != id, ct))
+            throw new RegleMetierException($"Le numéro de tribunal «{numero}» est déjà utilisé.");
+
+        tribunal.NumeroTribunal = numero;
+        tribunal.NomTribunal = nom;
+        tribunal.NomTribunalAr = (cmd.NomTribunalAr ?? string.Empty).Trim();
+        tribunal.TypeTribunal = cmd.TypeTribunal;
+        tribunal.NiveauJuridiction = cmd.NiveauJuridiction;
+        tribunal.IdVille = cmd.IdVille;
+        tribunal.DateCreation = cmd.DateCreation ?? tribunal.DateCreation;
+
+        await _db.SaveChangesAsync(ct);
+        return ToDto(tribunal);
+    }
+
     private static TribunalDto ToDto(Tribunal t) =>
         new(t.Id, t.NomTribunal, t.TypeTribunal, t.NiveauJuridiction, t.IdVille, t.IsActive,
-            t.NomTribunalAr);
+            t.NomTribunalAr)
+        {
+            NumeroTribunal = t.NumeroTribunal,
+            DateCreation = t.DateCreation
+        };
 }

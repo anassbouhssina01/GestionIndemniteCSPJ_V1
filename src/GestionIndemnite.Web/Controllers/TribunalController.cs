@@ -53,16 +53,15 @@ public class TribunalController : Controller
         var villes = await _villes.ListAsync(null, true, ct);
         var byId = tous.ToDictionary(t => t.Id);
 
-        var parentIds = new Dictionary<Guid, Guid?>();
+        var parents = new Dictionary<Guid, ParentOrganigrammeDto?>();
         foreach (var tribunal in tous)
         {
-            var parent = await _service.GetParentAtAsync(tribunal.Id, null, ct);
-            parentIds[tribunal.Id] = parent?.Id;
+            parents[tribunal.Id] = await _service.GetParentAtAsync(tribunal.Id, null, ct);
         }
 
         var ressorts = tous.ToDictionary(
             t => t.Id,
-            t => ResoudreRessortId(t.Id, byId, parentIds));
+            t => ResoudreRessortId(t.Id, byId, parents));
 
         var liste = tous.Where(t => inactifs || t.IsActive);
 
@@ -111,14 +110,6 @@ public class TribunalController : Controller
         ViewBag.NiveauxFr = NiveauxFr;
         ViewBag.ById = byId;
         ViewBag.Ressorts = ressorts;
-
-        var parents = new Dictionary<Guid, string?>();
-        foreach (var kv in parentIds)
-        {
-            parents[kv.Key] = kv.Value is Guid parentId && byId.TryGetValue(parentId, out var parent)
-                ? parent.NomTribunal
-                : null;
-        }
         ViewBag.Parents = parents;
 
         return View(resultat);
@@ -127,7 +118,7 @@ public class TribunalController : Controller
     private static Guid? ResoudreRessortId(
         Guid id,
         IReadOnlyDictionary<Guid, TribunalDto> byId,
-        IReadOnlyDictionary<Guid, Guid?> parentIds)
+        IReadOnlyDictionary<Guid, ParentOrganigrammeDto?> parents)
     {
         var courant = id;
         var vus = new HashSet<Guid>();
@@ -137,10 +128,10 @@ public class TribunalController : Controller
             if (tribunal.NiveauJuridiction is NiveauJuridiction.CA or NiveauJuridiction.Cassation)
                 return tribunal.Id;
 
-            if (!parentIds.TryGetValue(courant, out var parentId) || parentId is null)
+            if (!parents.TryGetValue(courant, out var parent) || parent is null)
                 return null;
 
-            courant = parentId.Value;
+            courant = parent.Id;
         }
 
         return null;
@@ -158,6 +149,22 @@ public class TribunalController : Controller
     {
         await _service.CreateAsync(command, ct);
         TempData["Succes"] = "Le tribunal a été créé.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> Edit(Guid id, CancellationToken ct)
+    {
+        var tribunal = await _service.GetAsync(id, ct);
+        await RemplirSelectsAsync(id, ct, tribunal);
+        return View(tribunal);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(Guid id, UpdateTribunalCommand command, CancellationToken ct)
+    {
+        await _service.UpdateAsync(id, command, ct);
+        TempData["Succes"] = "Le tribunal a été mis à jour.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -179,14 +186,18 @@ public class TribunalController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task RemplirSelectsAsync(Guid? idExclu, CancellationToken ct)
+    private async Task RemplirSelectsAsync(
+        Guid? idExclu,
+        CancellationToken ct,
+        TribunalDto? selection = null)
     {
         var villes = await _villes.ListAsync(null, false, ct);
         var tribunaux = await _service.ListAsync(false, ct);
 
         ViewBag.Villes = new SelectList(
             villes.Select(v => new SelectListItem(v.NomVille, v.Id.ToString())),
-            "Value", "Text");
+            "Value", "Text",
+            selection?.IdVille.ToString());
 
         ViewBag.Parents = new SelectList(
             tribunaux.Where(t => t.Id != idExclu)
@@ -195,10 +206,12 @@ public class TribunalController : Controller
 
         ViewBag.Types = new SelectList(
             TypesFr.Select(kv => new SelectListItem(kv.Value, ((int)kv.Key).ToString())),
-            "Value", "Text");
+            "Value", "Text",
+            selection is null ? null : ((int)selection.TypeTribunal).ToString());
 
         ViewBag.Niveaux = new SelectList(
             NiveauxFr.Select(kv => new SelectListItem(kv.Value, ((int)kv.Key).ToString())),
-            "Value", "Text");
+            "Value", "Text",
+            selection is null ? null : ((int)selection.NiveauJuridiction).ToString());
     }
 }

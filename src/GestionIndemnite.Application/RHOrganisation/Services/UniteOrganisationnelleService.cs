@@ -42,6 +42,7 @@ public class UniteOrganisationnelleService
             NomUniteAr = (cmd.NomUniteAr ?? string.Empty).Trim(),
             TypeUnite = cmd.TypeUnite,
             IdVille = cmd.IdVille,
+            DateCreation = cmd.DateCreation ?? DateOnly.FromDateTime(DateTime.UtcNow),
             IsActive = true
         };
 
@@ -148,6 +149,31 @@ public class UniteOrganisationnelleService
         return false;
     }
 
+    public async Task<UniteOrganisationnelleDto> UpdateAsync(
+        Guid id,
+        UpdateUniteOrganisationnelleCommand cmd,
+        CancellationToken ct = default)
+    {
+        var unite = await _db.UnitesOrganisationnelles.FirstOrDefaultAsync(u => u.Id == id, ct)
+            ?? throw new RegleMetierException("L'unité organisationnelle est introuvable.");
+
+        var nom = (cmd.NomUnite ?? string.Empty).Trim();
+        if (string.IsNullOrEmpty(nom))
+            throw new RegleMetierException("Le nom de l'unité organisationnelle est obligatoire.");
+
+        unite.NomUnite = nom;
+        unite.NomUniteAr = (cmd.NomUniteAr ?? string.Empty).Trim();
+        unite.TypeUnite = cmd.TypeUnite;
+        unite.IdVille = cmd.IdVille;
+        unite.DateCreation = cmd.DateCreation ?? unite.DateCreation;
+
+        await _db.SaveChangesAsync(ct);
+        return ToDto(unite);
+    }
+
     private static UniteOrganisationnelleDto ToDto(UniteOrganisationnelle u) =>
-        new(u.Id, u.NomUnite, u.TypeUnite, u.IdVille, u.IsActive, u.NomUniteAr);
+        new(u.Id, u.NomUnite, u.TypeUnite, u.IdVille, u.IsActive, u.NomUniteAr)
+        {
+            DateCreation = u.DateCreation
+        };
 }

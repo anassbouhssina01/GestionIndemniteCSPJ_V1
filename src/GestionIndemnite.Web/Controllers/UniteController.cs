@@ -39,11 +39,10 @@ public class UniteController : Controller
         ViewBag.Villes = villes.ToDictionary(v => v.Id, v => v.NomVille);
         ViewBag.TypesFr = TypesFr;
 
-        var parents = new Dictionary<Guid, string?>();
+        var parents = new Dictionary<Guid, ParentOrganigrammeDto?>();
         foreach (var unite in unites)
         {
-            var parent = await _service.GetParentAtAsync(unite.Id, null, ct);
-            parents[unite.Id] = parent?.Nom;
+            parents[unite.Id] = await _service.GetParentAtAsync(unite.Id, null, ct);
         }
         ViewBag.Parents = parents;
 
@@ -65,6 +64,22 @@ public class UniteController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    public async Task<IActionResult> Edit(Guid id, CancellationToken ct)
+    {
+        var unite = await _service.GetAsync(id, ct);
+        await RemplirSelectsAsync(ct, unite);
+        return View(unite);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(Guid id, UpdateUniteOrganisationnelleCommand command, CancellationToken ct)
+    {
+        await _service.UpdateAsync(id, command, ct);
+        TempData["Succes"] = "L'unité organisationnelle a été mise à jour.";
+        return RedirectToAction(nameof(Index));
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Disable(Guid id, CancellationToken ct)
@@ -83,21 +98,26 @@ public class UniteController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task RemplirSelectsAsync(CancellationToken ct)
+    private async Task RemplirSelectsAsync(
+        CancellationToken ct,
+        UniteOrganisationnelleDto? selection = null)
     {
         var villes = await _villes.ListAsync(null, false, ct);
         var unites = await _service.ListAsync(false, ct);
 
         ViewBag.Villes = new SelectList(
             villes.Select(v => new SelectListItem(v.NomVille, v.Id.ToString())),
-            "Value", "Text");
+            "Value", "Text",
+            selection?.IdVille.ToString());
 
         ViewBag.Parents = new SelectList(
-            unites.Select(u => new SelectListItem(u.NomUnite, u.Id.ToString())),
+            unites.Where(u => selection is null || u.Id != selection.Id)
+                .Select(u => new SelectListItem(u.NomUnite, u.Id.ToString())),
             "Value", "Text");
 
         ViewBag.Types = new SelectList(
             TypesFr.Select(kv => new SelectListItem(kv.Value, ((int)kv.Key).ToString())),
-            "Value", "Text");
+            "Value", "Text",
+            selection is null ? null : ((int)selection.TypeUnite).ToString());
     }
 }
