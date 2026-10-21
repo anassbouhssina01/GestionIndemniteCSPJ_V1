@@ -115,8 +115,8 @@ public class FonctionnaireService
             || await _db.SituationAdministratives.AnyAsync(h => h.IdFonctionnaire == id, ct)
             || await _db.HistoriqueAffectations.AnyAsync(h => h.IdFonctionnaire == id, ct)
             || await _db.HistoriqueResponsabilites.AnyAsync(h => h.IdFonctionnaire == id, ct);
-        //if (hasHistorique)
-        //    throw new RegleMetierException("Impossible de supprimer un fonctionnaire disposant d'un historique.");
+        if (hasHistorique)
+            throw new RegleMetierException("Impossible de supprimer un fonctionnaire disposant d'un historique.");
 
         _db.Fonctionnaires.Remove(entity);
         await _db.SaveChangesAsync(ct);
