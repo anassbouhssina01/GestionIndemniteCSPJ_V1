@@ -19,19 +19,19 @@ public class StatutAdministratifService
         CreateStatutAdministratifCommand cmd,
         CancellationToken ct = default)
     {
-        var code = cmd.CodeStatut.Trim();
+        var code = (cmd.CodeStatut ?? string.Empty).Trim();
         if (string.IsNullOrEmpty(code))
-            throw new RegleMetierException("رمز الوضعية الإدارية مطلوب");
+            throw new RegleMetierException("Le code de la situation administrative est obligatoire.");
 
         if (await _db.StatutAdministratifs.AnyAsync(s => s.CodeStatut == code, ct))
-            throw new RegleMetierException($"الرمز «{code}» مستعمل من قبل");
+            throw new RegleMetierException($"Le code «{code}» est déjà utilisé.");
 
         var entity = new StatutAdministratif
         {
             Id = Guid.NewGuid(),
             CodeStatut = code,
-            LibelleStatutAr = cmd.LibelleStatutAr.Trim(),
-            LibelleStatutFr = cmd.LibelleStatutFr.Trim(),
+            LibelleStatutAr = (cmd.LibelleStatutAr ?? string.Empty).Trim(),
+            LibelleStatutFr = (cmd.LibelleStatutFr ?? string.Empty).Trim(),
             Description = cmd.Description?.Trim()
         };
 
@@ -47,14 +47,14 @@ public class StatutAdministratifService
         CancellationToken ct = default)
     {
         var entity = await _db.StatutAdministratifs.FirstOrDefaultAsync(s => s.Id == id, ct)
-            ?? throw new RegleMetierException("الوضعية الإدارية غير موجودة");
+            ?? throw new RegleMetierException("La situation administrative est introuvable.");
 
         if (entity.EstActif && !cmd.EstActif
             && await _db.SituationAdministratives.AnyAsync(h => h.IdStatut == id, ct))
-            throw new RegleMetierException("لا يمكن تعطيل وضعية إدارية مستعملة في السجلات");
+            throw new RegleMetierException("Impossible de désactiver une situation administrative utilisée dans les dossiers.");
 
-        entity.LibelleStatutAr = cmd.LibelleStatutAr.Trim();
-        entity.LibelleStatutFr = cmd.LibelleStatutFr.Trim();
+        entity.LibelleStatutAr = (cmd.LibelleStatutAr ?? string.Empty).Trim();
+        entity.LibelleStatutFr = (cmd.LibelleStatutFr ?? string.Empty).Trim();
         entity.Description = cmd.Description?.Trim();
         entity.EstActif = cmd.EstActif;
 
@@ -66,7 +66,7 @@ public class StatutAdministratifService
     {
         var entity = await _db.StatutAdministratifs.AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == id, ct)
-            ?? throw new RegleMetierException("الوضعية الإدارية غير موجودة");
+            ?? throw new RegleMetierException("La situation administrative est introuvable.");
         return ToDto(entity);
     }
 
@@ -85,10 +85,10 @@ public class StatutAdministratifService
     public async Task DisableAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _db.StatutAdministratifs.FirstOrDefaultAsync(s => s.Id == id, ct)
-            ?? throw new RegleMetierException("الوضعية الإدارية غير موجودة");
+            ?? throw new RegleMetierException("La situation administrative est introuvable.");
 
         if (await _db.SituationAdministratives.AnyAsync(h => h.IdStatut == id, ct))
-            throw new RegleMetierException("لا يمكن تعطيل وضعية إدارية مستعملة في السجلات");
+            throw new RegleMetierException("Impossible de désactiver une situation administrative utilisée dans les dossiers.");
 
         entity.EstActif = false;
         await _db.SaveChangesAsync(ct);
@@ -97,7 +97,7 @@ public class StatutAdministratifService
     public async Task EnableAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _db.StatutAdministratifs.FirstOrDefaultAsync(s => s.Id == id, ct)
-            ?? throw new RegleMetierException("الوضعية الإدارية غير موجودة");
+            ?? throw new RegleMetierException("La situation administrative est introuvable.");
         entity.EstActif = true;
         await _db.SaveChangesAsync(ct);
     }

@@ -15,12 +15,12 @@ public static class AffectationRules
         var uniteSet = idUniteAffectation.HasValue;
 
         if (tribunalSet == uniteSet)
-            throw new RegleMetierException("يجب تحديد المحكمة أو الهيكل بدقة واحدة");
+            throw new RegleMetierException("Vous devez sélectionner exactement un tribunal ou une unité organisationnelle.");
 
         if (sectionTribunal.HasValue && !tribunalSet)
-            throw new RegleMetierException("القسم مسموح به فقط في حالة التعيين لمحكمة");
+            throw new RegleMetierException("La section n'est autorisée que pour une affectation à un tribunal.");
 
         if (idUniteTravail.HasValue && !tribunalSet)
-            throw new RegleMetierException("هيكل العمل مسموح به فقط في حالة التعيين لمحكمة");
+            throw new RegleMetierException("L'unité de travail n'est autorisée que pour une affectation à un tribunal.");
     }
 }

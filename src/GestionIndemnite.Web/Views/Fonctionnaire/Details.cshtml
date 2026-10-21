@@ -85,10 +85,7 @@
         </button>
     </div>
     <div class="actions-right">
-        <form method="post" asp-action="Delete" asp-route-id="@f.Id"
-              onsubmit="return confirm('Confirmer la suppression de ce fonctionnaire ?');">
-            <button type="submit" class="btn btn-outline-danger">Supprimer</button>
-        </form>
+        <button type="button" class="btn btn-outline-danger" onclick="openDossierModal('modal-supprimer')">Supprimer</button>
     </div>
 </div>
 
@@ -131,8 +128,8 @@
             <div class="key-value-list">
                 <div class="kv-item"><span class="k">Nom (Français) :</span><span class="v">@f.NomFr</span></div>
                 <div class="kv-item"><span class="k">Prénom (Français) :</span><span class="v">@f.PrenomFr</span></div>
-                <div class="kv-item"><span class="k">الاسم العائلي :</span><span class="v arabic-text" dir="rtl">@f.NomAr</span></div>
-                <div class="kv-item"><span class="k">الاسم الشخصي :</span><span class="v arabic-text" dir="rtl">@f.PrenomAr</span></div>
+                <div class="kv-item"><span class="k">Nom (arabe) :</span><span class="v arabic-text" dir="rtl">@f.NomAr</span></div>
+                <div class="kv-item"><span class="k">Prénom (arabe) :</span><span class="v arabic-text" dir="rtl">@f.PrenomAr</span></div>
                 <div class="kv-item"><span class="k">CIN :</span><span class="v">@f.Cin</span></div>
                 <div class="kv-item"><span class="k">Matricule CSPJ :</span><span class="v">@f.Matricule</span></div>
                 <div class="kv-item"><span class="k">Genre :</span><span class="v">@genreFr</span></div>
@@ -731,6 +728,31 @@
     </div>
 </div>
 
+<!-- ===== MODAL : CONFIRMATION DE SUPPRESSION ===== -->
+<div id="modal-supprimer" class="modal-overlay">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <div>
+                <h3 class="modal-title">SUPPRIMER LE FONCTIONNAIRE</h3>
+                <p class="modal-subtitle">Cette action est définitive.</p>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-supprimer')">&times;</button>
+        </div>
+        <form method="post" asp-action="Delete" asp-route-id="@f.Id">
+            <div class="modal-body">
+                <p class="mb-0">
+                    Confirmez-vous la suppression de <strong>@f.NomFr @f.PrenomFr</strong>
+                    (matricule <strong>@f.Matricule</strong>) ?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeDossierModal('modal-supprimer')">Annuler</button>
+                <button type="submit" class="btn btn-outline-danger">Supprimer définitivement</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         (function () {
@@ -786,11 +808,15 @@
                 document.body.style.overflow = "";
             };
 
-            Array.prototype.forEach.call(document.querySelectorAll(".modal-overlay"), function (overlay) {
-                overlay.addEventListener("click", function (event) {
-                    if (event.target === overlay) {
-                        closeDossierModal(overlay.id);
-                    }
+            // La modale ne se ferme plus au clic sur le fond : uniquement "×", "Annuler" ou "Échap".
+            Array.prototype.forEach.call(document.querySelectorAll(".modal-dialog"), function (dialog) {
+                dialog.addEventListener("click", function (event) {
+                    event.stopPropagation();
+                });
+            });
+            Array.prototype.forEach.call(document.querySelectorAll(".modal-header, .modal-footer"), function (el) {
+                el.addEventListener("click", function (event) {
+                    event.stopPropagation();
                 });
             });
 

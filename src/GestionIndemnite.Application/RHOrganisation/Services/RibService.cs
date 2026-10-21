@@ -26,7 +26,7 @@ public class RibService
 
         var fonctionnaire = await _db.Fonctionnaires
             .FirstOrDefaultAsync(f => f.Id == idFonctionnaire, ct)
-            ?? throw new RegleMetierException("الموظف غير موجود");
+            ?? throw new RegleMetierException("Le fonctionnaire est introuvable.");
 
         var ownsTransaction = !_db.HasActiveTransaction;
         var transaction = ownsTransaction

@@ -958,6 +958,9 @@ namespace GestionIndemnite.Infrastructure.RHOrganisation.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateOnly?>("DateCreation")
+                        .HasColumnType("date");
+
                     b.Property<Guid>("IdVille")
                         .HasColumnType("uniqueidentifier");
 
@@ -982,6 +985,13 @@ namespace GestionIndemnite.Infrastructure.RHOrganisation.Persistence.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasDefaultValue("");
 
+                    b.Property<string>("NumeroTribunal")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("");
+
                     b.Property<int>("TypeTribunal")
                         .HasColumnType("int");
 
@@ -994,6 +1004,11 @@ namespace GestionIndemnite.Infrastructure.RHOrganisation.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdVille");
+
+                    b.HasIndex("NumeroTribunal")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Tribunal_Numero")
+                        .HasFilter("[NumeroTribunal] <> '' AND [IsDeleted] = 0");
 
                     b.ToTable("Tribunal", "rh", t =>
                         {
@@ -1013,6 +1028,9 @@ namespace GestionIndemnite.Infrastructure.RHOrganisation.Persistence.Migrations
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("DateCreation")
+                        .HasColumnType("date");
 
                     b.Property<Guid>("IdVille")
                         .HasColumnType("uniqueidentifier");

@@ -36,7 +36,7 @@ public static class ExcelImportReader
         {
             totalOctets += lu;
             if (totalOctets > TailleMaxOctets)
-                throw new RegleMetierException("حجم الملف يتجاوز 5 ميغا");
+                throw new RegleMetierException("La taille du fichier dépasse 5 Mo.");
             tampon.Write(octets, 0, lu);
         }
 
@@ -49,7 +49,7 @@ public static class ExcelImportReader
         }
         catch
         {
-            throw new RegleMetierException("الملف ليس ملف Excel صالح");
+            throw new RegleMetierException("Le fichier n'est pas un fichier Excel valide.");
         }
 
         using (workbook)
@@ -57,7 +57,7 @@ public static class ExcelImportReader
             foreach (var nomFeuille in FeuillesRequises)
             {
                 if (!workbook.Worksheets.TryGetWorksheet(nomFeuille, out _))
-                    throw new RegleMetierException("الملف يجب أن يحتوي على كل الأوراق المطلوبة");
+                    throw new RegleMetierException("Le fichier doit contenir toutes les feuilles requises.");
             }
 
             var erreurs = new List<ErreurLigne>();
@@ -79,7 +79,7 @@ public static class ExcelImportReader
                 + situations.Count + affectations.Count + responsabilites.Count + erreurs.Count;
 
             if (nombreLignes > LignesMax)
-                throw new RegleMetierException("عدد الأسطر يتجاوز 5000");
+                throw new RegleMetierException("Le nombre de lignes dépasse 5000.");
 
             return new ImportWorkbook(
                 nombreLignes,

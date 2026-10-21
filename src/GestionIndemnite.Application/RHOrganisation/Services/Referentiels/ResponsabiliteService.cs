@@ -19,19 +19,19 @@ public class ResponsabiliteService
         CreateResponsabiliteCommand cmd,
         CancellationToken ct = default)
     {
-        var code = cmd.CodeResponsabilite.Trim();
+        var code = (cmd.CodeResponsabilite ?? string.Empty).Trim();
         if (string.IsNullOrEmpty(code))
-            throw new RegleMetierException("رمز المسؤولية مطلوب");
+            throw new RegleMetierException("Le code de la responsabilité est obligatoire.");
 
         if (await _db.Responsabilites.AnyAsync(r => r.CodeResponsabilite == code, ct))
-            throw new RegleMetierException($"الرمز «{code}» مستعمل من قبل");
+            throw new RegleMetierException($"Le code «{code}» est déjà utilisé.");
 
         var entity = new Responsabilite
         {
             Id = Guid.NewGuid(),
             CodeResponsabilite = code,
-            LibelleResponsabiliteAr = cmd.LibelleResponsabiliteAr.Trim(),
-            LibelleResponsabiliteFr = cmd.LibelleResponsabiliteFr.Trim(),
+            LibelleResponsabiliteAr = (cmd.LibelleResponsabiliteAr ?? string.Empty).Trim(),
+            LibelleResponsabiliteFr = (cmd.LibelleResponsabiliteFr ?? string.Empty).Trim(),
             Description = cmd.Description?.Trim()
         };
 
@@ -47,14 +47,14 @@ public class ResponsabiliteService
         CancellationToken ct = default)
     {
         var entity = await _db.Responsabilites.FirstOrDefaultAsync(r => r.Id == id, ct)
-            ?? throw new RegleMetierException("المسؤولية غير موجودة");
+            ?? throw new RegleMetierException("La responsabilité est introuvable.");
 
         if (entity.EstActif && !cmd.EstActif
             && await _db.HistoriqueResponsabilites.AnyAsync(h => h.IdResponsabilite == id, ct))
-            throw new RegleMetierException("لا يمكن تعطيل مسؤولية مستعملة في السجلات");
+            throw new RegleMetierException("Impossible de désactiver une responsabilité utilisée dans les dossiers.");
 
-        entity.LibelleResponsabiliteAr = cmd.LibelleResponsabiliteAr.Trim();
-        entity.LibelleResponsabiliteFr = cmd.LibelleResponsabiliteFr.Trim();
+        entity.LibelleResponsabiliteAr = (cmd.LibelleResponsabiliteAr ?? string.Empty).Trim();
+        entity.LibelleResponsabiliteFr = (cmd.LibelleResponsabiliteFr ?? string.Empty).Trim();
         entity.Description = cmd.Description?.Trim();
         entity.EstActif = cmd.EstActif;
 
@@ -66,7 +66,7 @@ public class ResponsabiliteService
     {
         var entity = await _db.Responsabilites.AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == id, ct)
-            ?? throw new RegleMetierException("المسؤولية غير موجودة");
+            ?? throw new RegleMetierException("La responsabilité est introuvable.");
         return ToDto(entity);
     }
 
@@ -85,10 +85,10 @@ public class ResponsabiliteService
     public async Task DisableAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _db.Responsabilites.FirstOrDefaultAsync(r => r.Id == id, ct)
-            ?? throw new RegleMetierException("المسؤولية غير موجودة");
+            ?? throw new RegleMetierException("La responsabilité est introuvable.");
 
         if (await _db.HistoriqueResponsabilites.AnyAsync(h => h.IdResponsabilite == id, ct))
-            throw new RegleMetierException("لا يمكن تعطيل مسؤولية مستعملة في السجلات");
+            throw new RegleMetierException("Impossible de désactiver une responsabilité utilisée dans les dossiers.");
 
         entity.EstActif = false;
         await _db.SaveChangesAsync(ct);
@@ -97,7 +97,7 @@ public class ResponsabiliteService
     public async Task EnableAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _db.Responsabilites.FirstOrDefaultAsync(r => r.Id == id, ct)
-            ?? throw new RegleMetierException("المسؤولية غير موجودة");
+            ?? throw new RegleMetierException("La responsabilité est introuvable.");
         entity.EstActif = true;
         await _db.SaveChangesAsync(ct);
     }
