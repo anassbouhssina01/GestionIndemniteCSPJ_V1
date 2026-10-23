@@ -9,6 +9,14 @@ namespace GestionIndemnite.Web.Controllers;
 
 public class TribunalController : Controller
 {
+    public record TribunalRessortItem(
+        TribunalDto Tribunal,
+        ParentOrganigrammeDto? CurrentParent,
+        Guid? RessortId,
+        DateOnly? RattachementDepuis,
+        DateOnly? RattachementJusquA,
+        bool IsCurrentRattachement);
+
     private static readonly Dictionary<TypeTribunal, string> TypesFr = new()
     {
         [TypeTribunal.Generale] = "Générale",
@@ -59,45 +67,105 @@ public class TribunalController : Controller
             parents[tribunal.Id] = await _service.GetParentAtAsync(tribunal.Id, null, ct);
         }
 
-        var ressorts = tous.ToDictionary(
-            t => t.Id,
-            t => ResoudreRessortId(t.Id, byId, parents));
+        var historiqueParTribunal = new Dictionary<Guid, IReadOnlyList<HistoriqueRattachementDto>>();
+        foreach (var tribunal in tous)
+        {
+            historiqueParTribunal[tribunal.Id] = await _service.GetHistoriqueRattachementsAsync(tribunal.Id, ct);
+        }
 
-        var liste = tous.Where(t => inactifs || t.IsActive);
+        async Task<Guid?> GetRessortForParentAsync(Guid parentId, DateOnly at)
+        {
+            var courant = parentId;
+            var vus = new HashSet<Guid>();
+            var guard = 0;
+            while (vus.Add(courant) && guard++ < 100 && byId.TryGetValue(courant, out var tribunal))
+            {
+                if (tribunal.NiveauJuridiction is NiveauJuridiction.CA or NiveauJuridiction.Cassation)
+                    return tribunal.Id;
+
+                var parentAt = await _service.GetParentAtAsync(courant, at, ct);
+                if (parentAt is null)
+                    return null;
+                courant = parentAt.Id;
+            }
+            return null;
+        }
+
+        var items = new List<TribunalRessortItem>();
+        foreach (var tribunal in tous)
+        {
+            var hist = historiqueParTribunal[tribunal.Id];
+            if (hist.Count == 0)
+            {
+                var currentParent = parents[tribunal.Id];
+                var ressortId = currentParent is null
+                    ? (tribunal.NiveauJuridiction is NiveauJuridiction.CA or NiveauJuridiction.Cassation ? tribunal.Id : null)
+                    : await GetRessortForParentAsync(currentParent.Id, currentParent.DateDebut);
+                items.Add(new TribunalRessortItem(tribunal, currentParent, ressortId, currentParent?.DateDebut, currentParent?.DateFin, true));
+                continue;
+            }
+
+            foreach (var h in hist)
+            {
+                if (h.IdTribunalParent is null)
+                    continue;
+                var ressortId = await GetRessortForParentAsync(h.IdTribunalParent.Value, h.DateDebut);
+                if (ressortId is null)
+                    continue;
+                var current = parents[tribunal.Id];
+                var isCurrent = h.DateFin == null && current is not null && current.Id == h.IdTribunalParent;
+                items.Add(new TribunalRessortItem(tribunal, new ParentOrganigrammeDto(h.IdTribunalParent.Value, h.NomTribunalParent ?? string.Empty, h.DateDebut, h.DateFin), ressortId, h.DateDebut, h.DateFin, isCurrent));
+            }
+
+            if (!hist.Any(h => h.DateFin == null && h.IdTribunalParent.HasValue))
+            {
+                var currentParent = parents[tribunal.Id];
+                if (currentParent is not null)
+                {
+                    var ressortId = await GetRessortForParentAsync(currentParent.Id, currentParent.DateDebut);
+                    if (ressortId.HasValue && !items.Any(x => x.Tribunal.Id == tribunal.Id && x.RessortId == ressortId && x.IsCurrentRattachement))
+                        items.Add(new TribunalRessortItem(tribunal, currentParent, ressortId, currentParent.DateDebut, currentParent.DateFin, true));
+                }
+            }
+        }
+
+        var listeItems = items.Where(i => inactifs || i.Tribunal.IsActive).ToList();
 
         if (!string.IsNullOrWhiteSpace(nom))
         {
             var terme = nom.Trim();
-            liste = liste.Where(t =>
-                t.NomTribunal.Contains(terme, StringComparison.OrdinalIgnoreCase)
-                || (t.NomTribunalAr ?? string.Empty).Contains(terme, StringComparison.OrdinalIgnoreCase));
+            listeItems = listeItems.Where(i =>
+                i.Tribunal.NomTribunal.Contains(terme, StringComparison.OrdinalIgnoreCase)
+                || (i.Tribunal.NomTribunalAr ?? string.Empty).Contains(terme, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
         if (type.HasValue)
         {
             var valeur = type.Value;
-            liste = liste.Where(t => t.TypeTribunal == valeur);
+            listeItems = listeItems.Where(i => i.Tribunal.TypeTribunal == valeur).ToList();
         }
 
         if (niveau.HasValue)
         {
             var valeur = niveau.Value;
-            liste = liste.Where(t => t.NiveauJuridiction == valeur);
+            listeItems = listeItems.Where(i => i.Tribunal.NiveauJuridiction == valeur).ToList();
         }
 
         if (idVille.HasValue)
         {
             var valeur = idVille.Value;
-            liste = liste.Where(t => t.IdVille == valeur);
+            listeItems = listeItems.Where(i => i.Tribunal.IdVille == valeur).ToList();
         }
 
         if (idRessort.HasValue)
         {
             var valeur = idRessort.Value;
-            liste = liste.Where(t => ressorts[t.Id] == valeur);
+            listeItems = listeItems.Where(i => i.RessortId == valeur).ToList();
         }
 
-        var resultat = liste.ToList();
+        var ressortsMap = tous.ToDictionary(
+            t => t.Id,
+            t => ResoudreRessortId(t.Id, byId, parents));
 
         ViewBag.Inactifs = inactifs;
         ViewBag.Nom = nom;
@@ -109,10 +177,11 @@ public class TribunalController : Controller
         ViewBag.TypesFr = TypesFr;
         ViewBag.NiveauxFr = NiveauxFr;
         ViewBag.ById = byId;
-        ViewBag.Ressorts = ressorts;
+        ViewBag.Ressorts = ressortsMap;
         ViewBag.Parents = parents;
+        ViewBag.Items = listeItems;
 
-        return View(resultat);
+        return View(tous.Where(t => inactifs || t.IsActive).DistinctBy(t => t.Id).ToList());
     }
 
     private static Guid? ResoudreRessortId(

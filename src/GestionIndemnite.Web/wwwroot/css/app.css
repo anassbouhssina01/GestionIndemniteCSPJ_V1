@@ -169,4 +169,26 @@
   margin: 0;
 }
 
+.row-historique-rattachement td {
+  background-color: #f7f9fc;
+  color: #475569;
+}
+
+.row-historique-rattachement .badge-parent-tribunal {
+  opacity: 0.8;
+}
+
+.badge-historique {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
 

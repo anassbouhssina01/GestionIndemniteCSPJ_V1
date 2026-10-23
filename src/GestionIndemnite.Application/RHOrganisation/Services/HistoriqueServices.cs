@@ -133,6 +133,7 @@ public class SituationAdministrativeService
             Id = Guid.NewGuid(),
             IdFonctionnaire = cmd.IdFonctionnaire,
             IdStatut = cmd.IdStatut,
+            MatriculeCspj = string.IsNullOrWhiteSpace(cmd.MatriculeCspj) ? null : cmd.MatriculeCspj.Trim(),
             DateDebut = cmd.DateDebut,
             DateFin = cmd.DateFin,
             IdDocument = cmd.IdDocument
@@ -200,7 +201,7 @@ public class SituationAdministrativeService
     }
 
     private static SituationAdministrativeDto ToDto(SituationAdministrative s) =>
-        new(s.Id, s.IdFonctionnaire, s.IdStatut, s.DateDebut, s.DateFin, s.IdDocument);
+        new(s.Id, s.IdFonctionnaire, s.IdStatut, s.MatriculeCspj, s.DateDebut, s.DateFin, s.IdDocument);
 }
 
 public class HistoriqueAffectationService

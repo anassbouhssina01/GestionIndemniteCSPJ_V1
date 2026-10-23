@@ -120,6 +120,36 @@ public class TribunalService
         return new ParentOrganigrammeDto(parent.Id, parent.NomTribunal, record.DateDebut, record.DateFin);
     }
 
+    public async Task<IReadOnlyList<HistoriqueRattachementDto>> GetHistoriqueRattachementsAsync(
+        Guid idTribunal,
+        CancellationToken ct = default)
+    {
+        var historique = await _db.HistoriqueOrganigrammeTribunalSet.AsNoTracking()
+            .Where(h => h.IdTribunal == idTribunal)
+            .OrderBy(h => h.DateDebut)
+            .ToListAsync(ct);
+
+        var parentIds = historique
+            .Where(h => h.IdTribunalParent.HasValue)
+            .Select(h => h.IdTribunalParent!.Value)
+            .Distinct()
+            .ToList();
+
+        var parents = await _db.Tribunaux.AsNoTracking()
+            .Where(t => parentIds.Contains(t.Id))
+            .ToDictionaryAsync(t => t.Id, t => t.NomTribunal, ct);
+
+        return historique.Select(h => new HistoriqueRattachementDto(
+            h.IdTribunal,
+            string.Empty,
+            h.IdTribunalParent,
+            h.IdTribunalParent.HasValue && parents.TryGetValue(h.IdTribunalParent.Value, out var nomParent)
+                ? nomParent
+                : null,
+            h.DateDebut,
+            h.DateFin)).ToList();
+    }
+
     public async Task DisableAsync(Guid id, CancellationToken ct = default)
     {
         var tribunal = await _db.Tribunaux.FirstOrDefaultAsync(t => t.Id == id, ct)

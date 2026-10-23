@@ -73,3 +73,11 @@ public record ParentOrganigrammeDto(
     string Nom,
     DateOnly DateDebut,
     DateOnly? DateFin);
+
+public record HistoriqueRattachementDto(
+    Guid IdTribunal,
+    string NomTribunal,
+    Guid? IdTribunalParent,
+    string? NomTribunalParent,
+    DateOnly DateDebut,
+    DateOnly? DateFin);

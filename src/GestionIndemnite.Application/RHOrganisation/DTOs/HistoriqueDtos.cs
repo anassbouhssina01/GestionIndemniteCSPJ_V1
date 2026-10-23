@@ -21,6 +21,7 @@ public record SituationAdministrativeDto(
     Guid Id,
     Guid IdFonctionnaire,
     Guid IdStatut,
+    string? MatriculeCspj,
     DateOnly DateDebut,
     DateOnly? DateFin,
     Guid? IdDocument);
@@ -28,6 +29,7 @@ public record SituationAdministrativeDto(
 public record CreateSituationAdministrativeCommand(
     Guid IdFonctionnaire,
     Guid IdStatut,
+    string? MatriculeCspj,
     DateOnly DateDebut,
     DateOnly? DateFin,
     Guid? IdDocument);

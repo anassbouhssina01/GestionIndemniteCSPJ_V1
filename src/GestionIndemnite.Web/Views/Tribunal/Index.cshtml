@@ -1,5 +1,6 @@
 @model IReadOnlyList<GestionIndemnite.Application.RHOrganisation.DTOs.TribunalDto>
 @using GestionIndemnite.Domain.RHOrganisation.Enums
+@using GestionIndemnite.Web.Controllers
 @{
     ViewData["Title"] = "Tribunaux";
     var inactifs = (bool)(ViewData["Inactifs"] ?? false);
@@ -14,15 +15,28 @@
     var parents = (Dictionary<Guid, GestionIndemnite.Application.RHOrganisation.DTOs.ParentOrganigrammeDto?>)ViewBag.Parents;
     var byId = (Dictionary<Guid, GestionIndemnite.Application.RHOrganisation.DTOs.TribunalDto>)ViewBag.ById;
     var ressorts = (Dictionary<Guid, Guid?>)ViewBag.Ressorts;
+    var itemsView = (IReadOnlyList<TribunalController.TribunalRessortItem>)ViewBag.Items;
 
-    var groupes = Model
-        .GroupBy(t => ressorts.TryGetValue(t.Id, out var ressortId) ? ressortId : null)
+    var groupes = itemsView
+        .GroupBy(t => t.Tribunal.NiveauJuridiction == NiveauJuridiction.CA
+            ? t.Tribunal.Id
+            : (t.Tribunal.NiveauJuridiction == NiveauJuridiction.Cassation
+                ? t.Tribunal.Id
+                : t.RessortId))
         .Select(g => new
         {
-            Ressort = g.Key is Guid caId && byId.TryGetValue(caId, out var ca) ? ca : null,
-            Items = g.OrderByDescending(t => (int)t.NiveauJuridiction).ThenBy(t => t.NomTribunal).ToList()
+            Ressort = g.Key is Guid caId && byId.TryGetValue(caId, out var ca)
+                ? ca
+                : (g.First().Tribunal.NiveauJuridiction == NiveauJuridiction.CA
+                    ? g.First().Tribunal
+                    : (g.First().Tribunal.NiveauJuridiction == NiveauJuridiction.Cassation
+                        ? g.First().Tribunal
+                        : null)),
+            Items = g.OrderByDescending(t => (int)t.Tribunal.NiveauJuridiction).ThenBy(t => t.Tribunal.NomTribunal).ToList()
         })
-        .OrderBy(g => g.Ressort is null ? 1 : 0)
+        .OrderBy(g => g.Ressort?.NiveauJuridiction == NiveauJuridiction.Cassation ? 0
+            : g.Ressort?.NiveauJuridiction == NiveauJuridiction.CA ? 1
+            : g.Ressort is null ? 3 : 2)
         .ThenBy(g => g.Ressort?.NomTribunal)
         .ToList();
 }
@@ -121,7 +135,7 @@
                     <tr class="table-group-row">
                         <td colspan="10">
                             <div class="group-row-inner">
-                                <span class="group-badge">Ressort</span>
+                                <span class="group-badge">@(groupe.Ressort?.NiveauJuridiction == NiveauJuridiction.Cassation ? "Cour de cassation" : groupe.Ressort?.NiveauJuridiction == NiveauJuridiction.CA ? "Cour d'appel" : "Ressort")</span>
                                 <span class="group-title">@(groupe.Ressort?.NomTribunal ?? "Sans cour d'appel")</span>
                                 @if (groupe.Ressort is not null)
                                 {
@@ -133,9 +147,12 @@
                             </div>
                         </td>
                     </tr>
-                    @foreach (var item in groupe.Items)
+                    @foreach (var entry in groupe.Items)
                     {
-                        <tr>
+                        var item = entry.Tribunal;
+                        var parent = entry.CurrentParent;
+                        var rowClass = entry.IsCurrentRattachement ? "" : "row-historique-rattachement";
+                        <tr class="@rowClass">
                             <td>@(string.IsNullOrWhiteSpace(item.NumeroTribunal) ? "—" : item.NumeroTribunal)</td>
                             <td>@item.NomTribunal</td>
                             <td dir="rtl">@(string.IsNullOrWhiteSpace(item.NomTribunalAr) ? "—" : item.NomTribunalAr)</td>
@@ -144,10 +161,14 @@
                             <td>@(villes.TryGetValue(item.IdVille, out var nomVille) ? nomVille : item.IdVille.ToString())</td>
                             <td>@(item.DateCreation?.ToString("dd/MM/yyyy") ?? "—")</td>
                             <td>
-                                @if (parents.TryGetValue(item.Id, out var parent) && parent is not null)
+                                @if (parent is not null && !string.IsNullOrWhiteSpace(parent.Nom))
                                 {
                                     <span class="badge-parent-tribunal">@parent.Nom</span>
-                                    <span class="text-muted small">depuis le @parent.DateDebut.ToString("dd/MM/yyyy")</span>
+                                    <span class="text-muted small">du @entry.RattachementDepuis?.ToString("dd/MM/yyyy") au @(entry.RattachementJusquA?.ToString("dd/MM/yyyy") ?? "aujourd'hui")</span>
+                                    @if (!entry.IsCurrentRattachement)
+                                    {
+                                        <span class="badge-historique">Ancien rattachement</span>
+                                    }
                                 }
                                 else
                                 {
