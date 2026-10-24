@@ -7,11 +7,9 @@
 
     var referentiels = new[] { "Tribunal", "Unite", "StatutAdministratif", "Pays", "Ville", "Cadre", "Grade", "Responsabilite" };
     var historiques = new[] { "HistoriqueCadreGrade", "SituationAdministrative", "HistoriqueAffectation", "HistoriqueResponsabilite", "HistoriqueOrganigrammeTribunal", "HistoriqueOrganigrammeUnite" };
-    var rapports = new[] { "Rapport", "Import" };
 
     var referentielsOpen = System.Array.IndexOf(referentiels, controller) >= 0 ? "open" : string.Empty;
     var historiquesOpen = System.Array.IndexOf(historiques, controller) >= 0 ? "open" : string.Empty;
-    var rapportsOpen = System.Array.IndexOf(rapports, controller) >= 0 ? "open" : string.Empty;
 
     var dateFr = DateTime.Now.ToString("dddd d MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("fr-FR"));
 }
@@ -58,7 +56,7 @@
                     </li>
                 </ul>
 
-                <div class="nav-section-title">GESTION FONCTIONNAIRE</div>
+                @* <div class="nav-section-title">GESTION FONCTIONNAIRE</div> *@
                 <ul class="nav-list">
                     <li>
                         <a class="@NavClass("Fonctionnaire")" asp-controller="Fonctionnaire" asp-action="Index">
@@ -73,20 +71,7 @@
                     </li>
                 </ul>
 
-                <div class="nav-section-title">BUREAU D'ORDRE</div>
-                <ul class="nav-list">
-                    <li>
-                        <a class="@NavClass("PieceJointe")" asp-controller="PieceJointe" asp-action="Index">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                            <span>Bureau d'ordre</span>
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="nav-section-title">PARAMÉTRAGE</div>
+                @* <div class="nav-section-title">PARAMÉTRAGE</div> *@
                 <ul class="nav-list">
                     <li class="nav-group-parent">
                         <button type="button" class="nav-item nav-parent-item @referentielsOpen" data-submenu-toggle="#submenu-parametrage">
@@ -144,7 +129,7 @@
                     </li>
                 </ul>
 
-                <div class="nav-section-title">HISTORIQUES</div>
+                @* <div class="nav-section-title">HISTORIQUES</div>
                 <ul class="nav-list">
                     <li class="nav-group-parent">
                         <button type="button" class="nav-item nav-parent-item @historiquesOpen" data-submenu-toggle="#submenu-historiques">
@@ -189,48 +174,9 @@
                                 </a>
                             </li>
                         </ul>
-                    </li>
-                </ul>
+                    </li> *@
+                @* </ul> *@
 
-                <div class="nav-section-title">RAPPORTS &amp; IMPORT</div>
-                <ul class="nav-list">
-                    <li class="nav-group-parent">
-                        <button type="button" class="nav-item nav-parent-item @rapportsOpen" data-submenu-toggle="#submenu-rapports">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="8" y1="13" x2="16" y2="13"></line>
-                                <line x1="8" y1="17" x2="13" y2="17"></line>
-                            </svg>
-                            <span>Rapports</span>
-                            <svg class="chevron-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                        </button>
-                        <ul class="sub-nav-list @rapportsOpen" id="submenu-rapports">
-                            <li>
-                                <a class="@SubNavClass("Rapport")" asp-controller="Rapport" asp-action="Trous">
-                                    <span class="sub-nav-indicator"></span><span class="sub-nav-text">Trous de carrière</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="@SubNavClass("Rapport")" asp-controller="Rapport" asp-action="SansJustificatif">
-                                    <span class="sub-nav-indicator"></span><span class="sub-nav-text">Sans justificatif</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="@SubNavClass("Rapport")" asp-controller="Rapport" asp-action="Chevauchements">
-                                    <span class="sub-nav-indicator"></span><span class="sub-nav-text">Chevauchements</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="@SubNavClass("Import")" asp-controller="Import" asp-action="Index">
-                                    <span class="sub-nav-indicator"></span><span class="sub-nav-text">Import Excel</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
             </nav>
 
             <div class="sidebar-footer">
@@ -277,18 +223,20 @@
                 </div>
             </header>
 
-            <main class="content-area" id="main-content">
-                <section class="app-view active">
-                    <partial name="_ErrorBanner" />
-                    @RenderBody()
-                </section>
-            </main>
+<main class="content-area" id="main-content">
+        <section class="app-view active">
+            <partial name="_Notification" />
+            <div id="toast-container" class="toast-container"></div>
+            @RenderBody()
+        </section>
+    </main>
         </div>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/theme.js" asp-append-version="true"></script>
+    <script src="~/js/autocomplete.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

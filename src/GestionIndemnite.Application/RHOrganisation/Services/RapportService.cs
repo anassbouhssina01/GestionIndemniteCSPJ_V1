@@ -39,7 +39,7 @@ public class RapportService
                 await _periodes.GetGapsAsync(_db.HistoriqueOrganigrammeTribunalSet, h => h.IdTribunal == idCle, ct),
             TypeHistoriqueRapport.OrganigrammeUnite =>
                 await _periodes.GetGapsAsync(_db.HistoriqueOrganigrammeUniteSet, h => h.IdUnite == idCle, ct),
-            _ => throw new RegleMetierException("نوع التقرير غير معروف")
+            _ => throw new RegleMetierException("Le type de rapport est inconnu.")
         };
 
         return gaps.Select(g => new TrouDto(type, idCle, g.DateDebut, g.DateFin)).ToList();
@@ -202,6 +202,6 @@ public class RapportService
     private static void ValidateType(TypeHistoriqueRapport type)
     {
         if (!Enum.IsDefined(type))
-            throw new RegleMetierException("نوع التقرير غير معروف");
+            throw new RegleMetierException("Le type de rapport est inconnu.");
     }
 }

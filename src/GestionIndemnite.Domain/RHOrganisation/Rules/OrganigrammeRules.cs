@@ -11,7 +11,7 @@ public static class OrganigrammeRules
         NiveauJuridiction.TPI => NiveauJuridiction.CA,
         NiveauJuridiction.CA => NiveauJuridiction.Cassation,
         NiveauJuridiction.Cassation => null,
-        _ => throw new RegleMetierException("مستوى الولاية القضائية غير معروف")
+        _ => throw new RegleMetierException("Le niveau de juridiction est inconnu.")
     };
 
     public static void ValidateTribunalParent(
@@ -21,16 +21,16 @@ public static class OrganigrammeRules
         if (childLevel == NiveauJuridiction.Cassation)
         {
             if (parentLevel is not null)
-                throw new RegleMetierException("محكمة التمييز لا تخضع لأي هيئة عليا");
+                throw new RegleMetierException("La Cour de cassation n'est rattachée à aucune juridiction supérieure.");
             return;
         }
 
         if (parentLevel is null)
-            throw new RegleMetierException("المستوى الأعلى مطلوب لهذا النوع من المحاكم");
+            throw new RegleMetierException("Un niveau supérieur est requis pour ce type de tribunal.");
 
         var required = RequiredParentLevel(childLevel)!.Value;
         if (parentLevel.Value != required)
-            throw new RegleMetierException("الاختصاص المباشر مطلوب: المستوى الأعلى يجب أن يكون المستوى الأعلى مباشرة");
+            throw new RegleMetierException("La compétence directe est requise : le niveau supérieur doit être immédiatement au-dessus.");
     }
 
     public static bool IsCycle(Guid id, Guid? parentId, Func<Guid, Guid?> getParentAtDate, DateOnly date)

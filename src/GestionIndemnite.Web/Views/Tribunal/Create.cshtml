@@ -14,6 +14,17 @@
 <form method="post" class="panel-card form-panel">
     <div class="form-grid-2">
         <div class="form-group">
+            <label class="form-label" for="NumeroTribunal">Numéro du tribunal</label>
+            <input class="form-input" id="NumeroTribunal" name="NumeroTribunal" maxlength="50" placeholder="Ex. 101" />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="DateCreation">Date de création</label>
+            <input class="form-input" type="date" id="DateCreation" name="DateCreation"
+                   value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+        </div>
+    </div>
+    <div class="form-grid-2">
+        <div class="form-group">
             <label class="form-label" for="NomTribunal">Nom du tribunal (français)</label>
             <input class="form-input" id="NomTribunal" name="NomTribunal" maxlength="200" required />
         </div>

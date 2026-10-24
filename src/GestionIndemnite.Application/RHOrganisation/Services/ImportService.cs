@@ -457,7 +457,7 @@ public class ImportService
             {
                 await _situations.AddAsync(
                     new CreateSituationAdministrativeCommand(
-                        fonctionnaire.Id, idStatut, ligne.DateDebut, ligne.DateFin, null),
+                        fonctionnaire.Id, idStatut, null, ligne.DateDebut, ligne.DateFin, null),
                     ct);
             }
 

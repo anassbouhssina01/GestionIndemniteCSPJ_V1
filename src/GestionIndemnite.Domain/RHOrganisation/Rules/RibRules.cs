@@ -10,21 +10,21 @@ public static class RibRules
         string numeroCompte,
         string cle)
     {
-        ValidateDigits(codeBanque, 3, "رمز البنك");
-        ValidateDigits(codeVille, 3, "رمز المدينة");
-        ValidateDigits(numeroCompte, 16, "رقم الحساب");
-        ValidateDigits(cle, 2, "المفتاح");
+        ValidateDigits(codeBanque, 3, "Le code banque");
+        ValidateDigits(codeVille, 3, "Le code ville");
+        ValidateDigits(numeroCompte, 16, "Le numéro de compte");
+        ValidateDigits(cle, 2, "La clé");
     }
 
     private static void ValidateDigits(string value, int length, string fieldName)
     {
         if (string.IsNullOrEmpty(value) || value.Length != length)
-            throw new RegleMetierException($"{fieldName} يجب أن يحتوي على {length} أرقام");
+            throw new RegleMetierException($"{fieldName} doit contenir {length} chiffres.");
 
         foreach (var c in value)
         {
             if (c is < '0' or > '9')
-                throw new RegleMetierException($"{fieldName} يجب أن يحتوي على أرقام فقط");
+                throw new RegleMetierException($"{fieldName} ne doit contenir que des chiffres.");
         }
     }
 }

@@ -54,7 +54,7 @@ public class PeriodeService
             }
             catch (DbUpdateException ex) when (IsUniqueViolation(ex))
             {
-                throw new RegleMetierException("تغيّر السجل أثناء الإدخال، أعد المحاولة");
+                throw new RegleMetierException("L'enregistrement a été modifié pendant la saisie. Veuillez réessayer.");
             }
 
             if (ownsTransaction)
@@ -97,7 +97,7 @@ public class PeriodeService
 
             var openOnes = existing.Where(e => e.DateFin is null).ToList();
             if (openOnes.Count > 1)
-                throw new RegleMetierException("يوجد أكثر من سجل مفتوح لنفس المفتاح");
+                throw new RegleMetierException("Il existe plusieurs enregistrements ouverts pour la même clé.");
 
             var closed = existing.Where(e => e.DateFin is not null).ToList();
 
@@ -105,7 +105,7 @@ public class PeriodeService
             {
                 var open = openOnes[0];
                 if (candidate.DateDebut <= open.DateDebut)
-                    throw new RegleMetierException("تاريخ بداية الفترة الجديدة يجب أن يلي بداية الفترة الحالية");
+                    throw new RegleMetierException("La date de début de la nouvelle période doit être postérieure à la date de début de la période en cours.");
 
                 var tracked = await set.FirstAsync(e => e.Id == open.Id, ct);
                 tracked.DateFin = candidate.DateDebut.AddDays(-1);
@@ -121,7 +121,7 @@ public class PeriodeService
             }
             catch (DbUpdateException ex) when (IsUniqueViolation(ex))
             {
-                throw new RegleMetierException("تغيّر السجل أثناء الإدخال، أعد المحاولة");
+                throw new RegleMetierException("L'enregistrement a été modifié pendant la saisie. Veuillez réessayer.");
             }
 
             if (ownsTransaction)
@@ -170,7 +170,7 @@ public class PeriodeService
             }
             catch (DbUpdateException ex) when (IsUniqueViolation(ex))
             {
-                throw new RegleMetierException("تغيّر السجل أثناء الإدخال، أعد المحاولة");
+                throw new RegleMetierException("L'enregistrement a été modifié pendant la saisie. Veuillez réessayer.");
             }
 
             if (ownsTransaction)
@@ -215,7 +215,7 @@ public class PeriodeService
     private static void ValidatePeriode(IPeriode candidate)
     {
         if (candidate.DateFin is not null && candidate.DateDebut > candidate.DateFin)
-            throw new RegleMetierException("تاريخ البداية يجب أن يسبق تاريخ النهاية");
+            throw new RegleMetierException("La date de début doit précéder la date de fin.");
     }
 
     private static void CheckChevauchement<T>(
@@ -230,11 +230,11 @@ public class PeriodeService
             var otherFin = other.DateFin ?? DateOnly.MaxValue;
 
             if (candidate.DateDebut <= otherFin && other.DateDebut <= candidateFin)
-                throw new RegleMetierException("توجد فترة متداخلة مع سجل موجود");
+                throw new RegleMetierException("Une période chevauche un enregistrement existant.");
         }
 
         if (candidate.DateFin is null && others.Any(o => o.DateFin is null))
-            throw new RegleMetierException("يوجد سجل مفتوح آخر لنفس المفتاح");
+            throw new RegleMetierException("Un autre enregistrement ouvert existe déjà pour la même clé.");
     }
 
     private static bool IsUniqueViolation(DbUpdateException ex)

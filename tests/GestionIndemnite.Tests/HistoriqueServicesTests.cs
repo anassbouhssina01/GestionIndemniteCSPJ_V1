@@ -96,7 +96,7 @@ public class HistoriqueServicesTests
 
         await Assert.ThrowsAsync<RegleMetierException>(() => svc.AddAsync(
             new CreateSituationAdministrativeCommand(
-                foncId, statutId, new DateOnly(2010, 8, 31), null, null)));
+                foncId, statutId, null, new DateOnly(2010, 8, 31), null, null)));
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class HistoriqueServicesTests
         var svc = new SituationAdministrativeService(context, new PeriodeService(context));
 
         var id = await svc.AddAsync(new CreateSituationAdministrativeCommand(
-            foncId, statutId, new DateOnly(2010, 9, 1), null, null));
+            foncId, statutId, null, new DateOnly(2010, 9, 1), null, null));
 
         Assert.NotEqual(default, id);
     }
@@ -120,11 +120,11 @@ public class HistoriqueServicesTests
         var svc = new SituationAdministrativeService(context, new PeriodeService(context));
 
         await svc.AddAsync(new CreateSituationAdministrativeCommand(
-            foncId, statutId, new DateOnly(2010, 9, 1), new DateOnly(2012, 8, 31), null));
+            foncId, statutId, null, new DateOnly(2010, 9, 1), new DateOnly(2012, 8, 31), null));
 
         await Assert.ThrowsAsync<RegleMetierException>(() => svc.AddAsync(
             new CreateSituationAdministrativeCommand(
-                foncId, statutId, new DateOnly(2010, 1, 1), new DateOnly(2010, 8, 31), null)));
+                foncId, statutId, null, new DateOnly(2010, 1, 1), new DateOnly(2010, 8, 31), null)));
     }
 
     [Fact]
@@ -443,7 +443,7 @@ public class HistoriqueServicesTests
         using var context = TestDatabaseFixture.CreateContext();
         var histSvc = new SituationAdministrativeService(context, new PeriodeService(context));
         await histSvc.AddAsync(new CreateSituationAdministrativeCommand(
-            foncId, statutId, new DateOnly(2010, 9, 1), null, null));
+            foncId, statutId, null, new DateOnly(2010, 9, 1), null, null));
 
         using var second = TestDatabaseFixture.CreateContext();
         var statutSvc = new StatutAdministratifService(second);
@@ -534,7 +534,7 @@ public class HistoriqueServicesTests
         var svc = new SituationAdministrativeService(context, new PeriodeService(context));
 
         await svc.AddAsync(new CreateSituationAdministrativeCommand(
-            foncId, statutId, new DateOnly(2010, 9, 1), null, null));
+            foncId, statutId, null, new DateOnly(2010, 9, 1), null, null));
 
         var tag = Guid.NewGuid().ToString("N")[..6];
         var statut2 = await new StatutAdministratifService(context).CreateAsync(

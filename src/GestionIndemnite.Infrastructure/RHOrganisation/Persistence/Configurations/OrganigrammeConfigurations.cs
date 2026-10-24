@@ -21,6 +21,16 @@ public class TribunalConfiguration : IEntityTypeConfiguration<Tribunal>
             .IsRequired()
             .HasDefaultValue(string.Empty);
 
+        builder.Property(e => e.NumeroTribunal)
+            .HasMaxLength(50)
+            .IsRequired()
+            .HasDefaultValue(string.Empty);
+
+        builder.HasIndex(e => e.NumeroTribunal)
+            .IsUnique()
+            .HasDatabaseName("UX_Tribunal_Numero")
+            .HasFilter("[NumeroTribunal] <> '' AND [IsDeleted] = 0");
+
         builder.HasOne<Ville>()
             .WithMany()
             .HasForeignKey(e => e.IdVille)

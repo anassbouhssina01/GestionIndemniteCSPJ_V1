@@ -5,11 +5,13 @@ namespace GestionIndemnite.Domain.RHOrganisation.Entities;
 
 public class Tribunal : AuditableEntity
 {
+    public string NumeroTribunal { get; set; } = string.Empty;
     public string NomTribunal { get; set; } = string.Empty;
     public string NomTribunalAr { get; set; } = string.Empty;
     public TypeTribunal TypeTribunal { get; set; }
     public NiveauJuridiction NiveauJuridiction { get; set; }
     public Guid IdVille { get; set; }
+    public DateOnly? DateCreation { get; set; }
     public bool IsActive { get; set; }
 }
 
@@ -19,6 +21,7 @@ public class UniteOrganisationnelle : AuditableEntity
     public string NomUniteAr { get; set; } = string.Empty;
     public TypeUnite TypeUnite { get; set; }
     public Guid IdVille { get; set; }
+    public DateOnly? DateCreation { get; set; }
     public bool IsActive { get; set; }
 }
 

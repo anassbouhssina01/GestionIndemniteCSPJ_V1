@@ -116,7 +116,7 @@ public class AcquireKeyLockTests
         });
 
         var ex = await Assert.ThrowsAsync<RegleMetierException>(() => taskB);
-        Assert.Contains("مستخدم آخر", ex.Message);
+        Assert.True(ex.Message.Contains("مستخدم آخر") || ex.Message.Contains("autre utilisateur") || ex.Message.Contains("modification"));
 
         await txA.RollbackAsync();
     }

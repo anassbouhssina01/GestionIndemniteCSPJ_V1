@@ -16,6 +16,7 @@ public class SituationAdministrative : AuditableEntity, IPeriode
 {
     public Guid IdFonctionnaire { get; set; }
     public Guid IdStatut { get; set; }
+    public string? MatriculeCspj { get; set; }
     public DateOnly DateDebut { get; set; }
     public DateOnly? DateFin { get; set; }
     public Guid? IdDocument { get; set; }

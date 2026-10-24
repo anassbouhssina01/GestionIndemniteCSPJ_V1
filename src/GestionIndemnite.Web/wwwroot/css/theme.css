@@ -1834,6 +1834,19 @@ html, body {
   pointer-events: auto;
 }
 
+/* Bootstrap applique "pointer-events: none" sur .modal-dialog (conflit de noms de
+   classes avec les modales de l'application) : sans cette correction, tous les
+   champs et boutons des modales sont inertes et les clics retombent sur le fond. */
+.modal-overlay .modal-dialog,
+.modal-overlay .modal-dialog * {
+  pointer-events: auto;
+}
+
+.modal-overlay:not(.active) .modal-dialog,
+.modal-overlay:not(.active) .modal-dialog * {
+  pointer-events: none;
+}
+
 .modal-dialog {
   background-color: #ffffff;
   border-radius: var(--radius-lg);
@@ -1841,6 +1854,7 @@ html, body {
   width: 100%;
   max-width: 620px;
   max-height: 90vh;
+  margin: 0;
   display: flex;
   flex-direction: column;
   transform: scale(0.96);
@@ -2132,27 +2146,77 @@ html, body {
   right: 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  z-index: 2000;
+  gap: 12px;
+  z-index: 3000;
+  pointer-events: none;
 }
 
 .toast {
   background-color: #0f1f38;
   color: #ffffff;
-  padding: 12px 18px;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
+  padding: 14px 20px;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(15, 31, 56, 0.25);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  font-size: 13.5px;
-  animation: slideIn 0.25s ease-out;
+  font-size: 0.95rem;
+  pointer-events: none;
+  min-width: 280px;
+  max-width: 420px;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
   border-left: 4px solid var(--emerald-primary);
 }
 
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+.toast.toast-success {
+  background-color: #0f7a3e;
+  border-left-color: #22c55e;
+}
+
+.toast.toast-error {
+  background-color: #b91c1c;
+  border-left-color: #ef4444;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast.hiding {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.toast-message {
+  flex: 1;
+  word-break: break-word;
+}
+
+.toast-close {
+  pointer-events: auto;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+@media (max-width: 640px) {
+  .toast-container {
+    right: 12px;
+    left: 12px;
+    align-items: stretch;
+  }
+  .toast {
+    min-width: 0;
+    max-width: 100%;
+  }
 }
 
 /* Utilitaires */

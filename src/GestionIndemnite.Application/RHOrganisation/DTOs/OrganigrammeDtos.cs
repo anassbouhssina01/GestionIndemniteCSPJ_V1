@@ -9,7 +9,11 @@ public record TribunalDto(
     NiveauJuridiction NiveauJuridiction,
     Guid IdVille,
     bool IsActive,
-    string NomTribunalAr);
+    string NomTribunalAr)
+{
+    public string NumeroTribunal { get; init; } = string.Empty;
+    public DateOnly? DateCreation { get; init; }
+}
 
 public record CreateTribunalCommand(
     string NomTribunal,
@@ -19,6 +23,19 @@ public record CreateTribunalCommand(
     Guid? IdTribunalParent)
 {
     public string? NomTribunalAr { get; init; }
+    public string? NumeroTribunal { get; init; }
+    public DateOnly? DateCreation { get; init; }
+}
+
+public record UpdateTribunalCommand(
+    string NomTribunal,
+    TypeTribunal TypeTribunal,
+    NiveauJuridiction NiveauJuridiction,
+    Guid IdVille)
+{
+    public string? NomTribunalAr { get; init; }
+    public string? NumeroTribunal { get; init; }
+    public DateOnly? DateCreation { get; init; }
 }
 
 public record UniteOrganisationnelleDto(
@@ -27,7 +44,10 @@ public record UniteOrganisationnelleDto(
     TypeUnite TypeUnite,
     Guid IdVille,
     bool IsActive,
-    string NomUniteAr);
+    string NomUniteAr)
+{
+    public DateOnly? DateCreation { get; init; }
+}
 
 public record CreateUniteOrganisationnelleCommand(
     string NomUnite,
@@ -36,10 +56,28 @@ public record CreateUniteOrganisationnelleCommand(
     Guid? IdUniteParent)
 {
     public string? NomUniteAr { get; init; }
+    public DateOnly? DateCreation { get; init; }
+}
+
+public record UpdateUniteOrganisationnelleCommand(
+    string NomUnite,
+    TypeUnite TypeUnite,
+    Guid IdVille)
+{
+    public string? NomUniteAr { get; init; }
+    public DateOnly? DateCreation { get; init; }
 }
 
 public record ParentOrganigrammeDto(
     Guid Id,
     string Nom,
+    DateOnly DateDebut,
+    DateOnly? DateFin);
+
+public record HistoriqueRattachementDto(
+    Guid IdTribunal,
+    string NomTribunal,
+    Guid? IdTribunalParent,
+    string? NomTribunalParent,
     DateOnly DateDebut,
     DateOnly? DateFin);

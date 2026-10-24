@@ -109,3 +109,86 @@
   }
 }
 
+/* ---- Regroupement des juridictions par ressort (cour d'appel) ---- */
+.data-table tbody tr.table-group-row td {
+  background-color: #eef3f9;
+  border-top: 2px solid var(--emerald-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 10px 18px;
+}
+
+.data-table tbody tr.table-group-row:hover td {
+  background-color: #eef3f9;
+}
+
+.group-row-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.group-row-inner .group-badge {
+  display: inline-block;
+  background-color: #0f2744;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.group-row-inner .group-title {
+  font-weight: 800;
+  color: #0f2744;
+  font-size: 13.5px;
+}
+
+.group-row-inner .group-meta {
+  color: var(--text-light);
+  font-size: 12px;
+}
+
+.group-row-inner .group-count {
+  margin-left: auto;
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.table-actions form {
+  margin: 0;
+}
+
+.row-historique-rattachement td {
+  background-color: #f7f9fc;
+  color: #475569;
+}
+
+.row-historique-rattachement .badge-parent-tribunal {
+  opacity: 0.8;
+}
+
+.badge-historique {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
+

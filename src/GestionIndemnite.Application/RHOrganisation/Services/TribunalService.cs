@@ -21,16 +21,23 @@ public class TribunalService
         CreateTribunalCommand cmd,
         CancellationToken ct = default)
     {
-        var nom = cmd.NomTribunal.Trim();
+        var nom = (cmd.NomTribunal ?? string.Empty).Trim();
         if (string.IsNullOrEmpty(nom))
-            throw new RegleMetierException("اسم المحكمة مطلوب");
+            throw new RegleMetierException("Le nom du tribunal est obligatoire.");
+
+        var numero = (cmd.NumeroTribunal ?? string.Empty).Trim();
+        if (numero.Length > 50)
+            throw new RegleMetierException("Le numéro du tribunal ne peut pas dépasser 50 caractères.");
+        if (!string.IsNullOrEmpty(numero) &&
+            await _db.Tribunaux.AnyAsync(t => t.NumeroTribunal == numero, ct))
+            throw new RegleMetierException($"Le numéro de tribunal «{numero}» est déjà utilisé.");
 
         NiveauJuridiction? parentLevel = null;
         if (cmd.IdTribunalParent.HasValue)
         {
             var parent = await _db.Tribunaux
                 .FirstOrDefaultAsync(t => t.Id == cmd.IdTribunalParent.Value, ct)
-                ?? throw new RegleMetierException("المحكمة الأم غير موجودة");
+                ?? throw new RegleMetierException("Le tribunal parent est introuvable.");
             parentLevel = parent.NiveauJuridiction;
         }
 
@@ -38,16 +45,18 @@ public class TribunalService
 
         var dateDebut = DateOnly.FromDateTime(DateTime.UtcNow);
         if (await IsCycleAsync(cmd.IdTribunalParent, dateDebut, ct))
-            throw new RegleMetierException("تمييز في الهيكلة: المحكمة لا يمكن أن تكون تابعة لنفسها أو لمن هو تابع لها");
+            throw new RegleMetierException("Incohérence hiérarchique : un tribunal ne peut pas être rattaché à lui-même ni à l'un de ses tribunaux subordonnés.");
 
         var tribunal = new Tribunal
         {
             Id = Guid.NewGuid(),
+            NumeroTribunal = numero,
             NomTribunal = nom,
             NomTribunalAr = (cmd.NomTribunalAr ?? string.Empty).Trim(),
             TypeTribunal = cmd.TypeTribunal,
             NiveauJuridiction = cmd.NiveauJuridiction,
             IdVille = cmd.IdVille,
+            DateCreation = cmd.DateCreation ?? DateOnly.FromDateTime(DateTime.UtcNow),
             IsActive = true
         };
 
@@ -71,7 +80,7 @@ public class TribunalService
     {
         var tribunal = await _db.Tribunaux.AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == id, ct)
-            ?? throw new RegleMetierException("المحكمة غير موجودة");
+            ?? throw new RegleMetierException("Le tribunal est introuvable.");
         return ToDto(tribunal);
     }
 
@@ -106,15 +115,45 @@ public class TribunalService
 
         var parent = await _db.Tribunaux.AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == record.IdTribunalParent, ct)
-            ?? throw new RegleMetierException("المحكمة الأم غير موجودة");
+            ?? throw new RegleMetierException("Le tribunal parent est introuvable.");
 
         return new ParentOrganigrammeDto(parent.Id, parent.NomTribunal, record.DateDebut, record.DateFin);
+    }
+
+    public async Task<IReadOnlyList<HistoriqueRattachementDto>> GetHistoriqueRattachementsAsync(
+        Guid idTribunal,
+        CancellationToken ct = default)
+    {
+        var historique = await _db.HistoriqueOrganigrammeTribunalSet.AsNoTracking()
+            .Where(h => h.IdTribunal == idTribunal)
+            .OrderBy(h => h.DateDebut)
+            .ToListAsync(ct);
+
+        var parentIds = historique
+            .Where(h => h.IdTribunalParent.HasValue)
+            .Select(h => h.IdTribunalParent!.Value)
+            .Distinct()
+            .ToList();
+
+        var parents = await _db.Tribunaux.AsNoTracking()
+            .Where(t => parentIds.Contains(t.Id))
+            .ToDictionaryAsync(t => t.Id, t => t.NomTribunal, ct);
+
+        return historique.Select(h => new HistoriqueRattachementDto(
+            h.IdTribunal,
+            string.Empty,
+            h.IdTribunalParent,
+            h.IdTribunalParent.HasValue && parents.TryGetValue(h.IdTribunalParent.Value, out var nomParent)
+                ? nomParent
+                : null,
+            h.DateDebut,
+            h.DateFin)).ToList();
     }
 
     public async Task DisableAsync(Guid id, CancellationToken ct = default)
     {
         var tribunal = await _db.Tribunaux.FirstOrDefaultAsync(t => t.Id == id, ct)
-            ?? throw new RegleMetierException("المحكمة غير موجودة");
+            ?? throw new RegleMetierException("Le tribunal est introuvable.");
         tribunal.IsActive = false;
         await _db.SaveChangesAsync(ct);
     }
@@ -122,7 +161,7 @@ public class TribunalService
     public async Task EnableAsync(Guid id, CancellationToken ct = default)
     {
         var tribunal = await _db.Tribunaux.FirstOrDefaultAsync(t => t.Id == id, ct)
-            ?? throw new RegleMetierException("المحكمة غير موجودة");
+            ?? throw new RegleMetierException("Le tribunal est introuvable.");
         tribunal.IsActive = true;
         await _db.SaveChangesAsync(ct);
     }
@@ -154,7 +193,42 @@ public class TribunalService
         return false;
     }
 
+    public async Task<TribunalDto> UpdateAsync(
+        Guid id,
+        UpdateTribunalCommand cmd,
+        CancellationToken ct = default)
+    {
+        var tribunal = await _db.Tribunaux.FirstOrDefaultAsync(t => t.Id == id, ct)
+            ?? throw new RegleMetierException("Le tribunal est introuvable.");
+
+        var nom = (cmd.NomTribunal ?? string.Empty).Trim();
+        if (string.IsNullOrEmpty(nom))
+            throw new RegleMetierException("Le nom du tribunal est obligatoire.");
+
+        var numero = (cmd.NumeroTribunal ?? string.Empty).Trim();
+        if (numero.Length > 50)
+            throw new RegleMetierException("Le numéro du tribunal ne peut pas dépasser 50 caractères.");
+        if (!string.IsNullOrEmpty(numero) &&
+            await _db.Tribunaux.AnyAsync(t => t.NumeroTribunal == numero && t.Id != id, ct))
+            throw new RegleMetierException($"Le numéro de tribunal «{numero}» est déjà utilisé.");
+
+        tribunal.NumeroTribunal = numero;
+        tribunal.NomTribunal = nom;
+        tribunal.NomTribunalAr = (cmd.NomTribunalAr ?? string.Empty).Trim();
+        tribunal.TypeTribunal = cmd.TypeTribunal;
+        tribunal.NiveauJuridiction = cmd.NiveauJuridiction;
+        tribunal.IdVille = cmd.IdVille;
+        tribunal.DateCreation = cmd.DateCreation ?? tribunal.DateCreation;
+
+        await _db.SaveChangesAsync(ct);
+        return ToDto(tribunal);
+    }
+
     private static TribunalDto ToDto(Tribunal t) =>
         new(t.Id, t.NomTribunal, t.TypeTribunal, t.NiveauJuridiction, t.IdVille, t.IsActive,
-            t.NomTribunalAr);
+            t.NomTribunalAr)
+        {
+            NumeroTribunal = t.NumeroTribunal,
+            DateCreation = t.DateCreation
+        };
 }

@@ -156,7 +156,7 @@ public class ImportServiceTests
         var resultat = await CreerService(context).ImporterAsync(
             fichier, new ImportOptions(false, "chevauchement.xlsx"));
 
-        Assert.Contains("توجد فترة متداخلة مع سجل موجود", resultat.ContenuRapport);
+        Assert.Contains("Une période chevauche un enregistrement existant", resultat.ContenuRapport);
         Assert.Contains("Groupe CH1 — REJETÉ", resultat.ContenuRapport);
 
         using var verif = TestDatabaseFixture.CreateContext();
@@ -260,7 +260,7 @@ public class ImportServiceTests
         var resultat = await CreerService(context).ImporterAsync(
             fichier, new ImportOptions(false, "rib.xlsx"));
 
-        Assert.Contains("رمز البنك", resultat.ContenuRapport);
+        Assert.Contains("Le code banque", resultat.ContenuRapport);
         Assert.Contains("Groupe RB1 — REJETÉ", resultat.ContenuRapport);
 
         using var verif = TestDatabaseFixture.CreateContext();
@@ -276,7 +276,7 @@ public class ImportServiceTests
         var ex = await Assert.ThrowsAsync<RegleMetierException>(() =>
             CreerService(context).ImporterAsync(fichier, new ImportOptions(false, "gros.xlsx")));
 
-        Assert.Contains("5 ميغا", ex.Message);
+        Assert.Contains("5 Mo", ex.Message);
     }
 
     [Fact]
@@ -288,7 +288,7 @@ public class ImportServiceTests
         var ex = await Assert.ThrowsAsync<RegleMetierException>(() =>
             CreerService(context).ImporterAsync(fichier, new ImportOptions(false, "faux.xlsx")));
 
-        Assert.Contains("ليس ملف Excel صالح", ex.Message);
+        Assert.Contains("n'est pas un fichier Excel valide", ex.Message);
     }
 
     [Fact]
@@ -428,7 +428,7 @@ public class ImportServiceTests
         var ex = await Assert.ThrowsAsync<RegleMetierException>(() =>
             CreerService(context).ImporterAsync(fichier, new ImportOptions(false, "incomplet.xlsx")));
 
-        Assert.Contains("كل الأوراق المطلوبة", ex.Message);
+        Assert.Contains("toutes les feuilles requises", ex.Message);
     }
 
     private sealed class UtilisateurTest : ICurrentUser

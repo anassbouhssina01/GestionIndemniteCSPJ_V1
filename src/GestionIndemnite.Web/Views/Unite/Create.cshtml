@@ -22,11 +22,18 @@
             <input class="form-input arabic-font" id="NomUniteAr" name="NomUniteAr" maxlength="200" dir="rtl" />
         </div>
     </div>
-    <div class="form-group">
-        <label class="form-label" for="TypeUnite">Type</label>
-        <select class="form-select" id="TypeUnite" name="TypeUnite" asp-items="ViewBag.Types" required>
-            <option value="">— Sélectionner —</option>
-        </select>
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label class="form-label" for="DateCreation">Date de création</label>
+            <input class="form-input" type="date" id="DateCreation" name="DateCreation"
+                   value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="TypeUnite">Type</label>
+            <select class="form-select" id="TypeUnite" name="TypeUnite" asp-items="ViewBag.Types" required>
+                <option value="">— Sélectionner —</option>
+            </select>
+        </div>
     </div>
     <div class="form-group">
         <label class="form-label" for="IdVille">Ville</label>

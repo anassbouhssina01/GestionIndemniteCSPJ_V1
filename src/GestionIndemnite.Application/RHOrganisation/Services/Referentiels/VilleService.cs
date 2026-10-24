@@ -17,16 +17,16 @@ public class VilleService
 
     public async Task<VilleDto> CreateAsync(CreateVilleCommand cmd, CancellationToken ct = default)
     {
-        var nom = cmd.NomVille.Trim();
+        var nom = (cmd.NomVille ?? string.Empty).Trim();
         if (string.IsNullOrEmpty(nom))
-            throw new RegleMetierException("اسم المدينة مطلوب");
+            throw new RegleMetierException("Le nom de la ville est obligatoire.");
 
         if (cmd.Latitude.HasValue != cmd.Longitude.HasValue)
             throw new RegleMetierException(
-                "إذا أدخلت إحداثيات فيجب إدخال خط الطول وخط العرض معاً");
+                "Si vous saisissez des coordonnées, la latitude et la longitude doivent être renseignées ensemble.");
 
         if (!await _db.PaysSet.AnyAsync(p => p.Id == cmd.IdPays, ct))
-            throw new RegleMetierException("البلد غير موجود");
+            throw new RegleMetierException("Le pays est introuvable.");
 
         var entity = new Ville
         {
@@ -47,13 +47,13 @@ public class VilleService
     public async Task<VilleDto> UpdateAsync(Guid id, UpdateVilleCommand cmd, CancellationToken ct = default)
     {
         var entity = await _db.Villes.FirstOrDefaultAsync(v => v.Id == id, ct)
-            ?? throw new RegleMetierException("المدينة غير موجودة");
+            ?? throw new RegleMetierException("La ville est introuvable.");
 
         if (cmd.Latitude.HasValue != cmd.Longitude.HasValue)
             throw new RegleMetierException(
-                "إذا أدخلت إحداثيات فيجب إدخال خط الطول وخط العرض معاً");
+                "Si vous saisissez des coordonnées, la latitude et la longitude doivent être renseignées ensemble.");
 
-        entity.NomVille = cmd.NomVille.Trim();
+        entity.NomVille = (cmd.NomVille ?? string.Empty).Trim();
         entity.NomVilleAr = (cmd.NomVilleAr ?? string.Empty).Trim();
         entity.Latitude = cmd.Latitude;
         entity.Longitude = cmd.Longitude;
@@ -66,7 +66,7 @@ public class VilleService
     public async Task<VilleDto> GetAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _db.Villes.AsNoTracking().FirstOrDefaultAsync(v => v.Id == id, ct)
-            ?? throw new RegleMetierException("المدينة غير موجودة");
+            ?? throw new RegleMetierException("La ville est introuvable.");
         return ToDto(entity);
     }
 
@@ -88,7 +88,7 @@ public class VilleService
     public async Task DisableAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _db.Villes.FirstOrDefaultAsync(v => v.Id == id, ct)
-            ?? throw new RegleMetierException("المدينة غير موجودة");
+            ?? throw new RegleMetierException("La ville est introuvable.");
         entity.IsActive = false;
         await _db.SaveChangesAsync(ct);
     }
@@ -96,7 +96,7 @@ public class VilleService
     public async Task EnableAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _db.Villes.FirstOrDefaultAsync(v => v.Id == id, ct)
-            ?? throw new RegleMetierException("المدينة غير موجودة");
+            ?? throw new RegleMetierException("La ville est introuvable.");
         entity.IsActive = true;
         await _db.SaveChangesAsync(ct);
     }

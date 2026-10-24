@@ -1,0 +1,14 @@
+﻿@{
+    var erreur = TempData["Erreur"] as string;
+    var succes = TempData["Succes"] as string;
+}
+
+@if (!string.IsNullOrEmpty(erreur))
+{
+    <input type="hidden" id="toast-data-error" value="@erreur" />
+}
+
+@if (!string.IsNullOrEmpty(succes))
+{
+    <input type="hidden" id="toast-data-success" value="@succes" />
+}
