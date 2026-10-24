@@ -5,7 +5,7 @@
 <div class="page-header-row">
     <div class="page-title-group">
         <h2 class="page-title-serif">TABLEAU DE BORD</h2>
-        <p class="page-description">Module RH Organisation — fonctionnaires, organigramme et bureau d'ordre.</p>
+        <p class="page-description">Module RH Organisation — fonctionnaires et organigramme.</p>
     </div>
 </div>
 
@@ -28,7 +28,7 @@
         <p class="page-description">Dossiers des fonctionnaires, RIB et documents justificatifs.</p>
         <div class="page-actions-group">
             <a class="btn btn-sm btn-outline" asp-controller="Fonctionnaire" asp-action="Index">Fonctionnaires</a>
-            <a class="btn btn-sm btn-outline" asp-controller="PieceJointe" asp-action="Index">Documents</a>
+            <a class="btn btn-sm btn-outline" asp-controller="PieceJointe" asp-action="Create">Téléverser un document</a>
         </div>
     </div>
 
@@ -49,16 +49,6 @@
             <a class="btn btn-sm btn-outline" asp-controller="SituationAdministrative" asp-action="Index">Situations</a>
             <a class="btn btn-sm btn-outline" asp-controller="HistoriqueAffectation" asp-action="Index">Affectations</a>
             <a class="btn btn-sm btn-outline" asp-controller="HistoriqueResponsabilite" asp-action="Index">Responsabilités</a>
-        </div>
-    </div>
-
-    <div class="panel-card">
-        <h4 class="panel-card-title">Rapports</h4>
-        <p class="page-description">Trous de carrière, périodes sans justificatif et chevauchements.</p>
-        <div class="page-actions-group">
-            <a class="btn btn-sm btn-outline" asp-controller="Rapport" asp-action="Trous">Trous</a>
-            <a class="btn btn-sm btn-outline" asp-controller="Rapport" asp-action="SansJustificatif">Sans justificatif</a>
-            <a class="btn btn-sm btn-outline" asp-controller="Rapport" asp-action="Chevauchements">Chevauchements</a>
         </div>
     </div>
 

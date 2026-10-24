@@ -13,18 +13,6 @@ public class PieceJointeController : Controller
         _service = service;
     }
 
-    public async Task<IActionResult> Index(
-        string? numeroDocument,
-        string? emetteur,
-        int? annee,
-        CancellationToken ct = default)
-    {
-        ViewBag.NumeroDocument = numeroDocument;
-        ViewBag.Emetteur = emetteur;
-        ViewBag.Annee = annee;
-        return View(await _service.SearchAsync(numeroDocument, emetteur, annee, ct));
-    }
-
     public IActionResult Create()
     {
         return View();
@@ -47,7 +35,7 @@ public class PieceJointeController : Controller
         await _service.UploadAsync(flux, command, ct);
 
         TempData["Succes"] = "Le document a été téléversé.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction("Index", "Fonctionnaire");
     }
 
     public async Task<IActionResult> Download(Guid id, CancellationToken ct)
@@ -55,14 +43,5 @@ public class PieceJointeController : Controller
         var piece = await _service.GetAsync(id, ct);
         var flux = await _service.DownloadAsync(id, ct);
         return File(flux, "application/pdf", piece.NomFichier ?? $"{piece.NumeroDocument}.pdf");
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
-    {
-        await _service.DeleteAsync(id, ct);
-        TempData["Succes"] = "Le document a été supprimé.";
-        return RedirectToAction(nameof(Index));
     }
 }
