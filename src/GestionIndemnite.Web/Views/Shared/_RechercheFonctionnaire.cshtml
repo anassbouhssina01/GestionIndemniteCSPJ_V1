@@ -10,15 +10,15 @@
 <form method="get" action="@Url.Action("Index")" class="filter-toolbar">
     <div class="filter-group">
         <label class="filter-label" for="matricule">Matricule</label>
-        <input class="form-input" id="matricule" name="matricule" value="@matricule" />
+        <input class="form-input" id="matricule" name="matricule" value="@matricule" data-autocomplete="Fonctionnaires:matricule" />
     </div>
     <div class="filter-group">
         <label class="filter-label" for="cin">CIN</label>
-        <input class="form-input" id="cin" name="cin" value="@cin" />
+        <input class="form-input" id="cin" name="cin" value="@cin" data-autocomplete="Fonctionnaires:cin" />
     </div>
     <div class="filter-group">
         <label class="filter-label" for="nom">Nom</label>
-        <input class="form-input" id="nom" name="nom" value="@nom" />
+        <input class="form-input" id="nom" name="nom" value="@nom" data-autocomplete="Fonctionnaires:nom" />
     </div>
     <div class="filter-group">
         <button type="submit" class="btn btn-outline btn-sm">Rechercher</button>
