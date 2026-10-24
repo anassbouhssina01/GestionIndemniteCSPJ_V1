@@ -85,7 +85,7 @@ public class FonctionnaireController : Controller
     }
 
     /// <summary>
-    /// Dossier complet : identitÃ©, RIB, situation actuelle et tous les historiques.
+    /// Dossier complet : identité, RIB, situation actuelle et tous les historiques.
     /// </summary>
     public async Task<IActionResult> Details(Guid id, CancellationToken ct)
     {

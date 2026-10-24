@@ -1,4 +1,4 @@
-﻿using GestionIndemnite.Domain.RHOrganisation.Exceptions;
+using GestionIndemnite.Domain.RHOrganisation.Exceptions;
 using GestionIndemnite.Web.RHOrganisation.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -84,7 +84,7 @@ public class RegleMetierExceptionFilterTests
     public async Task Filtre_redirige_vers_referer_si_meme_hote_et_page_differente()
     {
         var contexte = CreerContexte(
-            new RegleMetierException("╪º┘ä┘ü╪¬╪▒╪⌐ ╪║┘è╪▒ ╪╡╪º┘ä╪¡╪⌐"),
+            new RegleMetierException("الفترة غير صالحة"),
             path: "/Fonctionnaire/Create",
             referer: "https://localhost/Fonctionnaire/Index");
 
@@ -98,7 +98,7 @@ public class RegleMetierExceptionFilterTests
     [Fact]
     public async Task Filtre_sans_referer_redirige_vers_accueil()
     {
-        var contexte = CreerContexte(new RegleMetierException("╪º┘ä┘ü╪¬╪▒╪⌐ ╪║┘è╪▒ ╪╡╪º┘ä╪¡╪⌐"), referer: null);
+        var contexte = CreerContexte(new RegleMetierException("الفترة غير صالحة"), referer: null);
 
         await CreerFiltre().OnExceptionAsync(contexte);
 
@@ -112,7 +112,7 @@ public class RegleMetierExceptionFilterTests
     public async Task Filtre_referer_meme_page_redirige_vers_accueil()
     {
         var contexte = CreerContexte(
-            new RegleMetierException("╪º┘ä┘ü╪¬╪▒╪⌐ ╪║┘è╪▒ ╪╡╪º┘ä╪¡╪⌐"),
+            new RegleMetierException("الفترة غير صالحة"),
             path: "/Fonctionnaire/Create",
             referer: "https://localhost/Fonctionnaire/Create");
 
@@ -125,7 +125,7 @@ public class RegleMetierExceptionFilterTests
     public async Task Filtre_referer_hote_different_redirige_vers_accueil()
     {
         var contexte = CreerContexte(
-            new RegleMetierException("╪º┘ä┘ü╪¬╪▒╪⌐ ╪║┘è╪▒ ╪╡╪º┘ä╪¡╪⌐"),
+            new RegleMetierException("الفترة غير صالحة"),
             referer: "https://exemple.test/Fonctionnaire/Index");
 
         await CreerFiltre().OnExceptionAsync(contexte);
@@ -146,7 +146,7 @@ public class RegleMetierExceptionFilterTests
 
         Assert.True(contexte.ExceptionHandled);
         Assert.Equal(
-            "Une erreur inattendue s'est produite. Veuillez r├⌐essayer.",
+            "Une erreur inattendue s'est produite. Veuillez réessayer.",
             tempData.Dictionary["Erreur"]);
     }
 
@@ -155,13 +155,13 @@ public class RegleMetierExceptionFilterTests
     {
         var tempData = new TempDataFactoryFake();
         var contexte = CreerContexte(
-            new RegleMetierException("La p├⌐riode demand├⌐e est invalide."),
+            new RegleMetierException("La période demandée est invalide."),
             referer: "https://localhost/Fonctionnaire/Index",
             tempData: tempData);
 
         await CreerFiltre().OnExceptionAsync(contexte);
 
         Assert.True(contexte.ExceptionHandled);
-        Assert.Equal("La p├⌐riode demand├⌐e est invalide.", tempData.Dictionary["Erreur"]);
+        Assert.Equal("La période demandée est invalide.", tempData.Dictionary["Erreur"]);
     }
 }

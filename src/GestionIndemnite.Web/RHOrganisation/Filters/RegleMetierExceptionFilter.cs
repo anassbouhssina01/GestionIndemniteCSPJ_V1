@@ -1,4 +1,4 @@
-﻿using GestionIndemnite.Domain.RHOrganisation.Exceptions;
+using GestionIndemnite.Domain.RHOrganisation.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 namespace GestionIndemnite.Web.RHOrganisation.Filters;
 
 /// <summary>
-/// Filtre global : toute exception lev├⌐e pendant l'ex├⌐cution d'une action est
-/// transform├⌐e en message affich├⌐ dans une fen├¬tre popup (toast), en fran├ºais.
+/// Filtre global : toute exception levée pendant l'exécution d'une action est
+/// transformée en message affiché dans une fenêtre popup (toast), en français.
 /// </summary>
 public sealed class RegleMetierExceptionFilter : IAsyncExceptionFilter
 {
     internal const string MessageErreurGenerique =
-        "Une erreur inattendue s'est produite. Veuillez r├⌐essayer.";
+        "Une erreur inattendue s'est produite. Veuillez réessayer.";
 
     private readonly ILogger<RegleMetierExceptionFilter> _logger;
 
@@ -26,9 +26,9 @@ public sealed class RegleMetierExceptionFilter : IAsyncExceptionFilter
         var message = ObtenirMessage(context.Exception);
 
         if (context.Exception is RegleMetierException regleMetier)
-            _logger.LogWarning(regleMetier, "R├¿gle m├⌐tier viol├⌐e : {Message}", regleMetier.Message);
+            _logger.LogWarning(regleMetier, "Règle métier violée : {Message}", regleMetier.Message);
         else
-            _logger.LogError(context.Exception, "Erreur non g├⌐r├⌐e : {Message}", context.Exception.Message);
+            _logger.LogError(context.Exception, "Erreur non gérée : {Message}", context.Exception.Message);
 
         context.ExceptionHandled = true;
 

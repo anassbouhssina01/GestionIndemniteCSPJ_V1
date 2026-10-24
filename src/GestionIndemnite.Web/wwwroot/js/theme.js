@@ -1,5 +1,5 @@
-﻿// theme.js ΓÇö comportements du th├¿me CSPJ pour l'application rendue c├┤t├⌐ serveur.
-// Contenu volontairement minimal : bascule de la barre lat├⌐rale et sous-menus.
+// theme.js — comportements du thème CSPJ pour l'application rendue côté serveur.
+// Contenu volontairement minimal : bascule de la barre latérale et sous-menus.
 (function () {
     "use strict";
 
@@ -20,7 +20,7 @@
             toast.classList.add('hiding');
             setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
         }
-        // La notification reste affich├⌐e : seul le bouton "├ù" la ferme.
+        // La notification reste affichée : seul le bouton "×" la ferme.
         if (closeBtn) closeBtn.addEventListener('click', hide);
     }
 
@@ -59,7 +59,7 @@
             });
         }
 
-        // Sous-menus repliables (Param├⌐trage, Historiques, Rapports...)
+        // Sous-menus repliables (Paramétrage, Historiques, Rapports...)
         var toggles = document.querySelectorAll("[data-submenu-toggle]");
         Array.prototype.forEach.call(toggles, function (btn) {
             btn.addEventListener("click", function () {
@@ -73,7 +73,7 @@
             });
         });
 
-        // Fermer la barre lat├⌐rale mobile lors d'un clic ├á l'ext├⌐rieur
+        // Fermer la barre latérale mobile lors d'un clic à l'extérieur
         document.addEventListener("click", function (event) {
             if (window.innerWidth > 1024 || !sidebar) {
                 return;

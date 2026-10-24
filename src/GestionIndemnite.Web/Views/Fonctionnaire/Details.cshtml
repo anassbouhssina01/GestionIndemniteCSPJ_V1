@@ -1,9 +1,9 @@
-﻿@model GestionIndemnite.Web.Models.DossierFonctionnaireViewModel
+@model GestionIndemnite.Web.Models.DossierFonctionnaireViewModel
 @using GestionIndemnite.Domain.RHOrganisation.Enums
 @{
     ViewData["Title"] = "Dossier du fonctionnaire";
     var f = Model.Fonctionnaire;
-    var genreFr = f.Genre == Genre.Masculin ? "Masculin" : "F├⌐minin";
+    var genreFr = f.Genre == Genre.Masculin ? "Masculin" : "Féminin";
     var p0 = !string.IsNullOrWhiteSpace(f.PrenomFr) ? f.PrenomFr.Substring(0, 1) : string.Empty;
     var n0 = !string.IsNullOrWhiteSpace(f.NomFr) ? f.NomFr.Substring(0, 1) : string.Empty;
     var initiales = (p0 + n0).ToUpperInvariant();
@@ -19,30 +19,30 @@
     var villeDto = affectationActuelle is null ? null : Model.VilleOfAffectation(affectationActuelle);
 
     var gradeActuelLibelle = gradeDto is null
-        ? "ΓÇö"
+        ? "—"
         : $"{gradeDto.LibelleGradeFr} ({gradeDto.NumeroReferencie})";
-    var statutActuelLibelle = statutDto is null ? "Non d├⌐fini" : statutDto.LibelleStatutFr;
-    var statutActuelCode = statutDto is null ? "ΓÇö" : statutDto.CodeStatut;
-    var affectationActuelleLibelle = affectationActuelle is null ? "ΓÇö" : Model.AffectationLabel(affectationActuelle);
+    var statutActuelLibelle = statutDto is null ? "Non défini" : statutDto.LibelleStatutFr;
+    var statutActuelCode = statutDto is null ? "—" : statutDto.CodeStatut;
+    var affectationActuelleLibelle = affectationActuelle is null ? "—" : Model.AffectationLabel(affectationActuelle);
 
     Func<Guid, string> gradeLabel = id =>
     {
         var g = Model.GradeOf(id);
-        return g is null ? "ΓÇö" : $"{g.LibelleGradeFr} ({g.NumeroReferencie})";
+        return g is null ? "—" : $"{g.LibelleGradeFr} ({g.NumeroReferencie})";
     };
     Func<Guid, string> statutLabel = id =>
     {
         var s = Model.StatutOf(id);
-        return s is null ? "ΓÇö" : $"{s.LibelleStatutFr} ({s.CodeStatut})";
+        return s is null ? "—" : $"{s.LibelleStatutFr} ({s.CodeStatut})";
     };
     Func<Guid, string> responsabiliteLabel = id =>
     {
         var r = Model.ResponsabiliteOf(id);
-        return r is null ? "ΓÇö" : $"{r.LibelleResponsabiliteFr} ({r.CodeResponsabilite})";
+        return r is null ? "—" : $"{r.LibelleResponsabiliteFr} ({r.CodeResponsabilite})";
     };
 }
 
-<!-- ===== BANNI├êRE PROFIL (template) ===== -->
+<!-- ===== BANNIÈRE PROFIL (template) ===== -->
 <div class="profile-hero-card">
     <div class="hero-left">
         <div class="profile-avatar-circle">@initiales</div>
@@ -72,7 +72,7 @@
     <div class="actions-left">
         <a class="btn btn-outline-dark" asp-action="Edit" asp-route-id="@f.Id">Modifier</a>
         <button type="button" class="btn btn-outline-dark" onclick="openDossierModal('modal-affecter')">Affecter</button>
-        <button type="button" class="btn btn-outline-dark" onclick="openDossierModal('modal-responsabilite')">Responsabilit├⌐</button>
+        <button type="button" class="btn btn-outline-dark" onclick="openDossierModal('modal-responsabilite')">Responsabilité</button>
         <button type="button" class="btn btn-outline-dark" onclick="openDossierModal('modal-changer-grade')">Changer de grade</button>
         <button type="button" class="btn btn-outline-dark" onclick="openDossierModal('modal-situation')">Ouvrir une situation</button>
         <button type="button" class="btn btn-outline-dark" onclick="window.print()" title="Imprimer la fiche individuelle">
@@ -91,15 +91,15 @@
 
 <!-- ===== ONGLETS (template) ===== -->
 <div class="profile-tabs-header" id="dossier-tabs">
-    <button type="button" class="profile-tab active" data-tab="tab-general">Informations g├⌐n├⌐rales</button>
-    <button type="button" class="profile-tab" data-tab="tab-grade">Grade &amp; carri├¿re</button>
-    <button type="button" class="profile-tab" data-tab="tab-responsabilites">Responsabilit├⌐s</button>
+    <button type="button" class="profile-tab active" data-tab="tab-general">Informations générales</button>
+    <button type="button" class="profile-tab" data-tab="tab-grade">Grade &amp; carrière</button>
+    <button type="button" class="profile-tab" data-tab="tab-responsabilites">Responsabilités</button>
     <button type="button" class="profile-tab" data-tab="tab-affectation">Affectation</button>
     <button type="button" class="profile-tab" data-tab="tab-situation">Situation</button>
     <button type="button" class="profile-tab" data-tab="tab-rib">RIB</button>
 </div>
 
-<!-- ===== ONGLET 1 : INFORMATIONS G├ëN├ëRALES ===== -->
+<!-- ===== ONGLET 1 : INFORMATIONS GÉNÉRALES ===== -->
 <div id="tab-general" class="profile-tab-content active">
     <div class="cards-highlight-grid">
         <div class="info-metric-card">
@@ -124,12 +124,12 @@
 
     <div class="info-panels-grid">
         <div class="panel-card">
-            <h4 class="panel-card-title">├ëtat civil &amp; Identit├⌐</h4>
+            <h4 class="panel-card-title">État civil &amp; Identité</h4>
             <div class="key-value-list">
-                <div class="kv-item"><span class="k">Nom (Fran├ºais) :</span><span class="v">@f.NomFr</span></div>
-                <div class="kv-item"><span class="k">Pr├⌐nom (Fran├ºais) :</span><span class="v">@f.PrenomFr</span></div>
+                <div class="kv-item"><span class="k">Nom (Français) :</span><span class="v">@f.NomFr</span></div>
+                <div class="kv-item"><span class="k">Prénom (Français) :</span><span class="v">@f.PrenomFr</span></div>
                 <div class="kv-item"><span class="k">Nom (arabe) :</span><span class="v arabic-text" dir="rtl">@f.NomAr</span></div>
-                <div class="kv-item"><span class="k">Pr├⌐nom (arabe) :</span><span class="v arabic-text" dir="rtl">@f.PrenomAr</span></div>
+                <div class="kv-item"><span class="k">Prénom (arabe) :</span><span class="v arabic-text" dir="rtl">@f.PrenomAr</span></div>
                 <div class="kv-item"><span class="k">CIN :</span><span class="v">@f.Cin</span></div>
                 <div class="kv-item"><span class="k">Matricule CSPJ :</span><span class="v">@f.Matricule</span></div>
                 <div class="kv-item"><span class="k">Genre :</span><span class="v">@genreFr</span></div>
@@ -139,23 +139,23 @@
         <div class="panel-card">
             <h4 class="panel-card-title">Affectation institutionnelle &amp; Cadre</h4>
             <div class="key-value-list">
-                <div class="kv-item"><span class="k">Cadre professionnel :</span><span class="v">@(cadreDto?.LibelleCadreFr ?? "ΓÇö")</span></div>
-                <div class="kv-item"><span class="k">Tribunal / Unit├⌐ :</span><span class="v">@affectationActuelleLibelle</span></div>
+                <div class="kv-item"><span class="k">Cadre professionnel :</span><span class="v">@(cadreDto?.LibelleCadreFr ?? "—")</span></div>
+                <div class="kv-item"><span class="k">Tribunal / Unité :</span><span class="v">@affectationActuelleLibelle</span></div>
                 <div class="kv-item">
                     <span class="k">Section :</span>
-                    <span class="v">@(affectationActuelle is null ? "ΓÇö" : DossierFonctionnaireViewModel.SectionLabel(affectationActuelle.SectionTribunal))</span>
+                    <span class="v">@(affectationActuelle is null ? "—" : DossierFonctionnaireViewModel.SectionLabel(affectationActuelle.SectionTribunal))</span>
                 </div>
                 <div class="kv-item">
-                    <span class="k">Unit├⌐ de travail :</span>
-                    <span class="v">@(affectationActuelle is null ? "ΓÇö" : Model.UniteOf(affectationActuelle.IdUniteTravail)?.NomUnite ?? "ΓÇö")</span>
+                    <span class="k">Unité de travail :</span>
+                    <span class="v">@(affectationActuelle is null ? "—" : Model.UniteOf(affectationActuelle.IdUniteTravail)?.NomUnite ?? "—")</span>
                 </div>
-                <div class="kv-item"><span class="k">Ville d'exercice :</span><span class="v">@(villeDto?.NomVille ?? "ΓÇö")</span></div>
+                <div class="kv-item"><span class="k">Ville d'exercice :</span><span class="v">@(villeDto?.NomVille ?? "—")</span></div>
                 <div class="kv-item">
-                    <span class="k">Affect├⌐ depuis :</span>
-                    <span class="v">@(affectationActuelle is null ? "ΓÇö" : affectationActuelle.DateDebut.ToString("dd/MM/yyyy"))</span>
+                    <span class="k">Affecté depuis :</span>
+                    <span class="v">@(affectationActuelle is null ? "—" : affectationActuelle.DateDebut.ToString("dd/MM/yyyy"))</span>
                 </div>
                 <div class="kv-item">
-                    <span class="k">Responsabilit├⌐s en cours :</span>
+                    <span class="k">Responsabilités en cours :</span>
                     <span class="v">@Model.ResponsabilitesActuelles.Count</span>
                 </div>
             </div>
@@ -163,7 +163,7 @@
     </div>
 </div>
 
-<!-- ===== ONGLET 2 : GRADE & CARRI├êRE ===== -->
+<!-- ===== ONGLET 2 : GRADE & CARRIÈRE ===== -->
 <div id="tab-grade" class="profile-tab-content">
     <div class="panel-card">
         <div class="section-header-split">
@@ -172,7 +172,7 @@
         </div>
         @if (Model.GradePeriods.Count == 0)
         {
-            <p class="text-muted mb-0">Aucune p├⌐riode enregistr├⌐e.</p>
+            <p class="text-muted mb-0">Aucune période enregistrée.</p>
         }
         else
         {
@@ -193,8 +193,8 @@
                             <tr>
                                 <td>@item.DateDebut.ToString("dd/MM/yyyy")</td>
                                 <td>@gradeLabel(item.IdGrade)</td>
-                                <td>@(item.DateFin?.ToString("dd/MM/yyyy") ?? "ΓÇö")</td>
-                                <td>@(Model.DocumentOf(item.IdDocument)?.NumeroDocument ?? "ΓÇö")</td>
+                                <td>@(item.DateFin?.ToString("dd/MM/yyyy") ?? "—")</td>
+                                <td>@(Model.DocumentOf(item.IdDocument)?.NumeroDocument ?? "—")</td>
                                 <td>
                                     @if (item.DateFin is null)
                                     {
@@ -202,7 +202,7 @@
                                     }
                                     else
                                     {
-                                        <span class="badge-statut-pill gray">Cl├┤tur├⌐</span>
+                                        <span class="badge-statut-pill gray">Clôturé</span>
                                     }
                                 </td>
                             </tr>
@@ -214,16 +214,16 @@
     </div>
 </div>
 
-<!-- ===== ONGLET 3 : RESPONSABILIT├ëS ===== -->
+<!-- ===== ONGLET 3 : RESPONSABILITÉS ===== -->
 <div id="tab-responsabilites" class="profile-tab-content">
     <div class="panel-card">
         <div class="section-header-split">
-            <h4 class="panel-card-title">Responsabilit├⌐s juridictionnelles &amp; administratives</h4>
-            <button type="button" class="btn btn-sm btn-outline" onclick="openDossierModal('modal-responsabilite')">+ Attribuer responsabilit├⌐</button>
+            <h4 class="panel-card-title">Responsabilités juridictionnelles &amp; administratives</h4>
+            <button type="button" class="btn btn-sm btn-outline" onclick="openDossierModal('modal-responsabilite')">+ Attribuer responsabilité</button>
         </div>
         @if (Model.ResponsabilitePeriods.Count == 0)
         {
-            <p class="text-muted mb-0">Aucune responsabilit├⌐ enregistr├⌐e.</p>
+            <p class="text-muted mb-0">Aucune responsabilité enregistrée.</p>
         }
         else
         {
@@ -231,9 +231,9 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Responsabilit├⌐</th>
-                            <th>Juridiction / Entit├⌐</th>
-                            <th>Date d├⌐but</th>
+                            <th>Responsabilité</th>
+                            <th>Juridiction / Entité</th>
+                            <th>Date début</th>
                             <th>Date fin</th>
                             <th>Statut</th>
                             <th class="text-right">Actions</th>
@@ -246,7 +246,7 @@
                                 <td>@responsabiliteLabel(item.IdResponsabilite)</td>
                                 <td>@Model.RattachementLabel(item)</td>
                                 <td>@item.DateDebut.ToString("dd/MM/yyyy")</td>
-                                <td>@(item.DateFin?.ToString("dd/MM/yyyy") ?? "ΓÇö")</td>
+                                <td>@(item.DateFin?.ToString("dd/MM/yyyy") ?? "—")</td>
                                 <td>
                                     @if (item.DateFin is null)
                                     {
@@ -254,7 +254,7 @@
                                     }
                                     else
                                     {
-                                        <span class="badge-statut-pill gray">Cl├┤tur├⌐</span>
+                                        <span class="badge-statut-pill gray">Clôturé</span>
                                     }
                                 </td>
                                 <td class="text-right">
@@ -263,7 +263,7 @@
                                         <form method="post" asp-action="CloturerResponsabilite" asp-route-id="@f.Id" class="inline-close-form">
                                             <input type="hidden" name="idPeriode" value="@item.Id" />
                                             <input class="form-input form-input-inline" type="date" name="dateFin" value="@aujourdHui" required />
-                                            <button type="submit" class="btn-table-action danger">Cl├┤turer</button>
+                                            <button type="submit" class="btn-table-action danger">Clôturer</button>
                                         </form>
                                     }
                                 </td>
@@ -285,7 +285,7 @@
         </div>
         @if (Model.AffectationPeriods.Count == 0)
         {
-            <p class="text-muted mb-0">Aucune affectation enregistr├⌐e.</p>
+            <p class="text-muted mb-0">Aucune affectation enregistrée.</p>
         }
         else
         {
@@ -293,12 +293,12 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Tribunal / Unit├⌐</th>
+                            <th>Tribunal / Unité</th>
                             <th>Section</th>
-                            <th>Unit├⌐ de travail</th>
+                            <th>Unité de travail</th>
                             <th>Date d'effet</th>
                             <th>Date fin</th>
-                            <th>├ëtat</th>
+                            <th>État</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -307,9 +307,9 @@
                             <tr>
                                 <td>@Model.AffectationLabel(item)</td>
                                 <td>@DossierFonctionnaireViewModel.SectionLabel(item.SectionTribunal)</td>
-                                <td>@(Model.UniteOf(item.IdUniteTravail)?.NomUnite ?? "ΓÇö")</td>
+                                <td>@(Model.UniteOf(item.IdUniteTravail)?.NomUnite ?? "—")</td>
                                 <td>@item.DateDebut.ToString("dd/MM/yyyy")</td>
-                                <td>@(item.DateFin?.ToString("dd/MM/yyyy") ?? "ΓÇö")</td>
+                                <td>@(item.DateFin?.ToString("dd/MM/yyyy") ?? "—")</td>
                                 <td>
                                     @if (item.DateFin is null)
                                     {
@@ -317,7 +317,7 @@
                                     }
                                     else
                                     {
-                                        <span class="badge-statut-pill gray">Cl├┤tur├⌐</span>
+                                        <span class="badge-statut-pill gray">Clôturé</span>
                                     }
                                 </td>
                             </tr>
@@ -338,7 +338,7 @@
         </div>
         @if (Model.SituationPeriods.Count == 0)
         {
-            <p class="text-muted mb-0">Aucune situation enregistr├⌐e.</p>
+            <p class="text-muted mb-0">Aucune situation enregistrée.</p>
         }
         else
         {
@@ -347,10 +347,10 @@
                     <thead>
                         <tr>
                             <th>Situation</th>
-                            <th>Date d├⌐but</th>
+                            <th>Date début</th>
                             <th>Date fin</th>
                             <th>Document</th>
-                            <th>├ëtat</th>
+                            <th>État</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -359,8 +359,8 @@
                             <tr>
                                 <td>@statutLabel(item.IdStatut)</td>
                                 <td>@item.DateDebut.ToString("dd/MM/yyyy")</td>
-                                <td>@(item.DateFin?.ToString("dd/MM/yyyy") ?? "ΓÇö")</td>
-                                <td>@(Model.DocumentOf(item.IdDocument)?.NumeroDocument ?? "ΓÇö")</td>
+                                <td>@(item.DateFin?.ToString("dd/MM/yyyy") ?? "—")</td>
+                                <td>@(Model.DocumentOf(item.IdDocument)?.NumeroDocument ?? "—")</td>
                                 <td>
                                     @if (item.DateFin is null)
                                     {
@@ -368,7 +368,7 @@
                                     }
                                     else
                                     {
-                                        <span class="badge-statut-pill gray">Cl├┤tur├⌐</span>
+                                        <span class="badge-statut-pill gray">Clôturé</span>
                                     }
                                 </td>
                             </tr>
@@ -397,14 +397,14 @@
             <div class="key-value-list mb-4">
                 <div class="kv-item"><span class="k">Code banque :</span><span class="v">@Model.RibActif.CodeBanque</span></div>
                 <div class="kv-item"><span class="k">Code ville :</span><span class="v">@Model.RibActif.CodeVille</span></div>
-                <div class="kv-item"><span class="k">Num├⌐ro de compte :</span><span class="v">@Model.RibActif.NumeroCompte</span></div>
-                <div class="kv-item"><span class="k">Cl├⌐ :</span><span class="v">@Model.RibActif.Cle</span></div>
+                <div class="kv-item"><span class="k">Numéro de compte :</span><span class="v">@Model.RibActif.NumeroCompte</span></div>
+                <div class="kv-item"><span class="k">Clé :</span><span class="v">@Model.RibActif.Cle</span></div>
             </div>
         }
 
         @if (Model.Ribs.Count == 0)
         {
-            <p class="text-muted mb-0">Aucun RIB enregistr├⌐.</p>
+            <p class="text-muted mb-0">Aucun RIB enregistré.</p>
         }
         else
         {
@@ -414,7 +414,7 @@
                         <tr>
                             <th>Banque</th>
                             <th>Compte</th>
-                            <th>├ëtat</th>
+                            <th>État</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -448,16 +448,16 @@
         <div class="modal-header">
             <div>
                 <h3 class="modal-title">CHANGEMENT DE GRADE</h3>
-                <p class="modal-subtitle">Avancement de grade ou changement d'├⌐chelon.</p>
+                <p class="modal-subtitle">Avancement de grade ou changement d'échelon.</p>
             </div>
-            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-changer-grade')">├ù</button>
+            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-changer-grade')">×</button>
         </div>
         <form method="post" asp-action="ChangerGrade" asp-route-id="@f.Id">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="idGrade" class="form-label">NOUVEAU GRADE</label>
                     <select id="idGrade" name="idGrade" class="form-select" required>
-                        <option value="">ΓÇö S├⌐lectionner ΓÇö</option>
+                        <option value="">— Sélectionner —</option>
                         @foreach (var grade in Model.Grades)
                         {
                             <option value="@grade.Id">@grade.LibelleGradeFr (@grade.NumeroReferencie)</option>
@@ -470,12 +470,12 @@
                         <input class="form-input" type="date" id="dateDebutGrade" name="dateDebut" value="@aujourdHui" required />
                     </div>
                     <div class="form-group">
-                        <label for="idDocumentGrade" class="form-label">DOCUMENT / R├ëF├ëRENCE</label>
+                        <label for="idDocumentGrade" class="form-label">DOCUMENT / RÉFÉRENCE</label>
                         <select class="form-select" id="idDocumentGrade" name="idDocument">
-                            <option value="">ΓÇö Aucun ΓÇö</option>
+                            <option value="">— Aucun —</option>
                             @foreach (var document in Model.Documents)
                             {
-                                <option value="@document.Id">@document.NumeroDocument ΓÇö @document.Emetteur (@document.AnneeDocument)</option>
+                                <option value="@document.Id">@document.NumeroDocument — @document.Emetteur (@document.AnneeDocument)</option>
                             }
                         </select>
                     </div>
@@ -489,22 +489,22 @@
     </div>
 </div>
 
-<!-- ===== MODAL : ATTRIBUER UNE RESPONSABILIT├ë (template) ===== -->
+<!-- ===== MODAL : ATTRIBUER UNE RESPONSABILITÉ (template) ===== -->
 <div id="modal-responsabilite" class="modal-overlay">
     <div class="modal-dialog">
         <div class="modal-header">
             <div>
-                <h3 class="modal-title">ATTRIBUTION DE RESPONSABILIT├ë</h3>
-                <p class="modal-subtitle">Conf├⌐rer une charge de direction juridictionnelle ou administrative.</p>
+                <h3 class="modal-title">ATTRIBUTION DE RESPONSABILITÉ</h3>
+                <p class="modal-subtitle">Conférer une charge de direction juridictionnelle ou administrative.</p>
             </div>
-            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-responsabilite')">├ù</button>
+            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-responsabilite')">×</button>
         </div>
         <form method="post" asp-action="AjouterResponsabilite" asp-route-id="@f.Id">
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="idResponsabilite" class="form-label">TITRE DE LA RESPONSABILIT├ë</label>
+                    <label for="idResponsabilite" class="form-label">TITRE DE LA RESPONSABILITÉ</label>
                     <select id="idResponsabilite" name="idResponsabilite" class="form-select" required>
-                        <option value="">ΓÇö S├⌐lectionner ΓÇö</option>
+                        <option value="">— Sélectionner —</option>
                         @foreach (var responsabilite in Model.Responsabilites)
                         {
                             <option value="@responsabilite.Id">@responsabilite.LibelleResponsabiliteFr (@responsabilite.CodeResponsabilite)</option>
@@ -515,7 +515,7 @@
                     <div class="form-group">
                         <label for="idTribunalResponsabilite" class="form-label">JURIDICTION</label>
                         <select class="form-select" id="idTribunalResponsabilite" name="idTribunal">
-                            <option value="">ΓÇö Aucune ΓÇö</option>
+                            <option value="">— Aucune —</option>
                             @foreach (var tribunal in Model.Tribunaux)
                             {
                                 <option value="@tribunal.Id">@tribunal.NomTribunal</option>
@@ -523,9 +523,9 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="idUniteResponsabilite" class="form-label">UNIT├ë ORGANISATIONNELLE</label>
+                        <label for="idUniteResponsabilite" class="form-label">UNITÉ ORGANISATIONNELLE</label>
                         <select class="form-select" id="idUniteResponsabilite" name="idUniteOrganisationnelle">
-                            <option value="">ΓÇö Aucune ΓÇö</option>
+                            <option value="">— Aucune —</option>
                             @foreach (var unite in Model.Unites)
                             {
                                 <option value="@unite.Id">@unite.NomUnite</option>
@@ -535,28 +535,28 @@
                 </div>
                 <div class="form-grid-2">
                     <div class="form-group">
-                        <label for="dateDebutResponsabilite" class="form-label">DATE DE D├ëBUT</label>
+                        <label for="dateDebutResponsabilite" class="form-label">DATE DE DÉBUT</label>
                         <input class="form-input" type="date" id="dateDebutResponsabilite" name="dateDebut" value="@aujourdHui" required />
                     </div>
                     <div class="form-group">
-                        <label for="dateFinResponsabilite" class="form-label">DATE DE FIN (SI D├ëTERMIN├ëE)</label>
+                        <label for="dateFinResponsabilite" class="form-label">DATE DE FIN (SI DÉTERMINÉE)</label>
                         <input class="form-input" type="date" id="dateFinResponsabilite" name="dateFin" />
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="idDocumentResponsabilite" class="form-label">DOCUMENT / R├ëF├ëRENCE</label>
+                    <label for="idDocumentResponsabilite" class="form-label">DOCUMENT / RÉFÉRENCE</label>
                     <select class="form-select" id="idDocumentResponsabilite" name="idDocument">
-                        <option value="">ΓÇö Aucun ΓÇö</option>
+                        <option value="">— Aucun —</option>
                         @foreach (var document in Model.Documents)
                         {
-                            <option value="@document.Id">@document.NumeroDocument ΓÇö @document.Emetteur (@document.AnneeDocument)</option>
+                            <option value="@document.Id">@document.NumeroDocument — @document.Emetteur (@document.AnneeDocument)</option>
                         }
                     </select>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" onclick="closeDossierModal('modal-responsabilite')">Annuler</button>
-                <button type="submit" class="btn btn-primary">Conf├⌐rer la responsabilit├⌐</button>
+                <button type="submit" class="btn btn-primary">Conférer la responsabilité</button>
             </div>
         </form>
     </div>
@@ -568,16 +568,16 @@
         <div class="modal-header">
             <div>
                 <h3 class="modal-title">AFFECTATION DU FONCTIONNAIRE</h3>
-                <p class="modal-subtitle">Rattacher l'agent ├á une juridiction ou ├á une unit├⌐ et d├⌐finir sa fonction.</p>
+                <p class="modal-subtitle">Rattacher l'agent à une juridiction ou à une unité et définir sa fonction.</p>
             </div>
-            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-affecter')">├ù</button>
+            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-affecter')">×</button>
         </div>
         <form method="post" asp-action="ChangerAffectation" asp-route-id="@f.Id">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="idTribunalAffectation" class="form-label">TRIBUNAL / JURIDICTION D'ACCUEIL</label>
                     <select class="form-select" id="idTribunalAffectation" name="idTribunalAffectation">
-                        <option value="">ΓÇö Aucun ΓÇö</option>
+                        <option value="">— Aucun —</option>
                         @foreach (var tribunal in Model.Tribunaux)
                         {
                             <option value="@tribunal.Id">@tribunal.NomTribunal</option>
@@ -585,9 +585,9 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="idUniteAffectation" class="form-label">UNIT├ë ORGANISATIONNELLE / D├ëPARTEMENT</label>
+                    <label for="idUniteAffectation" class="form-label">UNITÉ ORGANISATIONNELLE / DÉPARTEMENT</label>
                     <select class="form-select" id="idUniteAffectation" name="idUniteAffectation">
-                        <option value="">ΓÇö Aucune ΓÇö</option>
+                        <option value="">— Aucune —</option>
                         @foreach (var unite in Model.Unites)
                         {
                             <option value="@unite.Id">@unite.NomUnite</option>
@@ -598,15 +598,15 @@
                     <div class="form-group">
                         <label for="sectionTribunal" class="form-label">SECTION</label>
                         <select class="form-select" id="sectionTribunal" name="sectionTribunal">
-                            <option value="">ΓÇö Aucune ΓÇö</option>
+                            <option value="">— Aucune —</option>
                             <option value="Parquet">Parquet</option>
-                            <option value="Presidence">Pr├⌐sidence</option>
+                            <option value="Presidence">Présidence</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="idUniteTravail" class="form-label">UNIT├ë DE TRAVAIL</label>
+                        <label for="idUniteTravail" class="form-label">UNITÉ DE TRAVAIL</label>
                         <select class="form-select" id="idUniteTravail" name="idUniteTravail">
-                            <option value="">ΓÇö Aucune ΓÇö</option>
+                            <option value="">— Aucune —</option>
                             @foreach (var unite in Model.Unites)
                             {
                                 <option value="@unite.Id">@unite.NomUnite</option>
@@ -620,17 +620,17 @@
                         <input class="form-input" type="date" id="dateDebutAffectation" name="dateDebut" value="@aujourdHui" required />
                     </div>
                     <div class="form-group">
-                        <label for="idDocumentAffectation" class="form-label">DOCUMENT / R├ëF├ëRENCE</label>
+                        <label for="idDocumentAffectation" class="form-label">DOCUMENT / RÉFÉRENCE</label>
                         <select class="form-select" id="idDocumentAffectation" name="idDocument">
-                            <option value="">ΓÇö Aucun ΓÇö</option>
+                            <option value="">— Aucun —</option>
                             @foreach (var document in Model.Documents)
                             {
-                                <option value="@document.Id">@document.NumeroDocument ΓÇö @document.Emetteur (@document.AnneeDocument)</option>
+                                <option value="@document.Id">@document.NumeroDocument — @document.Emetteur (@document.AnneeDocument)</option>
                             }
                         </select>
                     </div>
                 </div>
-                <p class="modal-subtitle mb-0">Remplir la juridiction ou l'unit├⌐ (pas les deux).</p>
+                <p class="modal-subtitle mb-0">Remplir la juridiction ou l'unité (pas les deux).</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" onclick="closeDossierModal('modal-affecter')">Annuler</button>
@@ -646,16 +646,16 @@
         <div class="modal-header">
             <div>
                 <h3 class="modal-title">OUVERTURE D'UNE SITUATION ADMINISTRATIVE</h3>
-                <p class="modal-subtitle">D├⌐finir l'├⌐tat administratif (activit├⌐, d├⌐tachement, mise en disponibilit├⌐).</p>
+                <p class="modal-subtitle">Définir l'état administratif (activité, détachement, mise en disponibilité).</p>
             </div>
-            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-situation')">├ù</button>
+            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-situation')">×</button>
         </div>
         <form method="post" asp-action="ChangerSituation" asp-route-id="@f.Id">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="idStatut" class="form-label">TYPE DE SITUATION</label>
                     <select id="idStatut" name="idStatut" class="form-select" required>
-                        <option value="">ΓÇö S├⌐lectionner ΓÇö</option>
+                        <option value="">— Sélectionner —</option>
                         @foreach (var statut in Model.Statuts)
                         {
                             <option value="@statut.Id">@statut.LibelleStatutFr (@statut.CodeStatut)</option>
@@ -664,16 +664,16 @@
                 </div>
                 <div class="form-grid-2">
                     <div class="form-group">
-                        <label for="dateDebutSituation" class="form-label">DATE DE D├ëBUT</label>
+                        <label for="dateDebutSituation" class="form-label">DATE DE DÉBUT</label>
                         <input class="form-input" type="date" id="dateDebutSituation" name="dateDebut" value="@aujourdHui" required />
                     </div>
                     <div class="form-group">
-                        <label for="idDocumentSituation" class="form-label">DOCUMENT / R├ëF├ëRENCE</label>
+                        <label for="idDocumentSituation" class="form-label">DOCUMENT / RÉFÉRENCE</label>
                         <select class="form-select" id="idDocumentSituation" name="idDocument">
-                            <option value="">ΓÇö Aucun ΓÇö</option>
+                            <option value="">— Aucun —</option>
                             @foreach (var document in Model.Documents)
                             {
-                                <option value="@document.Id">@document.NumeroDocument ΓÇö @document.Emetteur (@document.AnneeDocument)</option>
+                                <option value="@document.Id">@document.NumeroDocument — @document.Emetteur (@document.AnneeDocument)</option>
                             }
                         </select>
                     </div>
@@ -695,7 +695,7 @@
                 <h3 class="modal-title">NOUVEAU RIB</h3>
                 <p class="modal-subtitle">Le nouveau RIB remplacera le RIB actif.</p>
             </div>
-            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-rib')">├ù</button>
+            <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-rib')">×</button>
         </div>
         <form method="post" asp-action="ChangerRib" asp-route-id="@f.Id">
             <div class="modal-body">
@@ -711,11 +711,11 @@
                 </div>
                 <div class="form-grid-2">
                     <div class="form-group">
-                        <label for="NumeroCompte" class="form-label">NUM├ëRO DE COMPTE</label>
+                        <label for="NumeroCompte" class="form-label">NUMÉRO DE COMPTE</label>
                         <input class="form-input" id="NumeroCompte" name="NumeroCompte" maxlength="30" required />
                     </div>
                     <div class="form-group">
-                        <label for="Cle" class="form-label">CL├ë</label>
+                        <label for="Cle" class="form-label">CLÉ</label>
                         <input class="form-input" id="Cle" name="Cle" maxlength="30" required />
                     </div>
                 </div>
@@ -734,7 +734,7 @@
         <div class="modal-header">
             <div>
                 <h3 class="modal-title">SUPPRIMER LE FONCTIONNAIRE</h3>
-                <p class="modal-subtitle">Cette action est d├⌐finitive.</p>
+                <p class="modal-subtitle">Cette action est définitive.</p>
             </div>
             <button type="button" class="modal-close-btn" onclick="closeDossierModal('modal-supprimer')">&times;</button>
         </div>
@@ -747,7 +747,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" onclick="closeDossierModal('modal-supprimer')">Annuler</button>
-                <button type="submit" class="btn btn-outline-danger">Supprimer d├⌐finitivement</button>
+                <button type="submit" class="btn btn-outline-danger">Supprimer définitivement</button>
             </div>
         </form>
     </div>
@@ -758,7 +758,7 @@
         (function () {
             "use strict";
 
-            // --- Onglets du dossier (m├¬me comportement que le template) ---
+            // --- Onglets du dossier (même comportement que le template) ---
             var tabs = document.querySelectorAll("#dossier-tabs .profile-tab");
             var contents = document.querySelectorAll(".profile-tab-content");
 
@@ -791,7 +791,7 @@
                 activateTab(hash, false);
             }
 
-            // --- Modales (m├¬me m├⌐canique que le template) ---
+            // --- Modales (même mécanique que le template) ---
             window.openDossierModal = function (modalId) {
                 var modal = document.getElementById(modalId);
                 if (!modal) { return; }
@@ -808,7 +808,7 @@
                 document.body.style.overflow = "";
             };
 
-            // La modale ne se ferme plus au clic sur le fond : uniquement "├ù", "Annuler" ou "├ëchap".
+            // La modale ne se ferme plus au clic sur le fond : uniquement "×", "Annuler" ou "Échap".
             Array.prototype.forEach.call(document.querySelectorAll(".modal-dialog"), function (dialog) {
                 dialog.addEventListener("click", function (event) {
                     event.stopPropagation();
@@ -828,7 +828,7 @@
                 }
             });
 
-            // --- Tribunal OU unit├⌐ (jamais les deux) ---
+            // --- Tribunal OU unité (jamais les deux) ---
             function exclusive(firstId, secondId) {
                 var first = document.getElementById(firstId);
                 var second = document.getElementById(secondId);
