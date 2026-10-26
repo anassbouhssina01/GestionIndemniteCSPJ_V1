@@ -129,13 +129,66 @@ public class FonctionnaireController : Controller
         return RedirectToAction(nameof(Details), new { id });
     }
 
+    public IActionResult AjoutEnMasse()
+    {
+        ViewBag.Genres = CreerSelectGenres();
+        return View();
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    public async Task<IActionResult> AjoutEnMasse(IFormCollection form, CancellationToken ct)
     {
-        await _service.DeleteAsync(id, ct);
-        TempData["Succes"] = "Le fonctionnaire a été supprimé.";
+        // Traitement en masse simple - à affiner selon les besoins
+        var lignes = form.Keys
+            .Where(k => k.StartsWith("Matricule["))
+            .Select(k => k.Substring("Matricule[".Length, k.Length - "Matricule[".Length - 1]))
+            .Distinct()
+            .ToList();
+
+        var count = 0;
+        foreach (var idx in lignes)
+        {
+            var matricule = form[$"Matricule[{idx}]"];
+            if (string.IsNullOrWhiteSpace(matricule)) continue;
+            var cin = form[$"Cin[{idx}]"];
+            var nomAr = form[$"NomAr[{idx}]"];
+            var prenomAr = form[$"PrenomAr[{idx}]"];
+            var nomFr = form[$"NomFr[{idx}]"];
+            var prenomFr = form[$"PrenomFr[{idx}]"];
+            var dateNaiss = form[$"DateNaissance[{idx}]"];
+            var dateRecrut = form[$"DateRecrutement[{idx}]"];
+            var genreStr = form[$"Genre[{idx}]"];
+
+            if (string.IsNullOrWhiteSpace(cin) || string.IsNullOrWhiteSpace(nomFr) || string.IsNullOrWhiteSpace(dateNaiss) || string.IsNullOrWhiteSpace(dateRecrut)) continue;
+
+            var cmd = new CreateFonctionnaireCommand(
+                matricule.ToString().Trim(),
+                cin.ToString().Trim(),
+                nomAr.ToString().Trim(),
+                prenomAr.ToString().Trim(),
+                nomFr.ToString().Trim(),
+                prenomFr.ToString().Trim(),
+                DateOnly.Parse(dateNaiss.ToString()),
+                DateOnly.Parse(dateRecrut.ToString()),
+                genreStr.ToString() == "1" ? Genre.Feminin : Genre.Masculin);
+
+            try
+            {
+                await _service.CreateAsync(cmd, ct);
+                count++;
+            }
+            catch { /* ignore duplicate/invalid rows */ }
+        }
+
+        TempData["Succes"] = $"{count} fonctionnaire(s) ajouté(s) en masse.";
         return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> MiseAJourEnMasse(CancellationToken ct)
+    {
+        ViewBag.Genres = CreerSelectGenres();
+        return View(await _service.SearchAsync(null, null, null, ct));
     }
 
     [HttpPost]

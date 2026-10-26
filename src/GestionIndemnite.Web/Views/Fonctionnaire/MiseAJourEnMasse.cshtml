@@ -1,0 +1,52 @@
+@model IReadOnlyList<GestionIndemnite.Application.RHOrganisation.DTOs.FonctionnaireDto>
+@{
+    ViewData["Title"] = "Mise à jour en masse des fonctionnaires";
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">MISE À JOUR EN MASSE DES FONCTIONNAIRES</h2>
+        <p class="page-description">Sélectionnez et modifiez directement les données dans le tableau.</p>
+    </div>
+    <div class="page-actions-group">
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Matricule</th>
+                    <th>CIN</th>
+                    <th>Nom (français)</th>
+                    <th>Prénom (français)</th>
+                    <th>Nom (arabe)</th>
+                    <th>Prénom (arabe)</th>
+                    <th>Date de naissance</th>
+                    <th>Date de recrutement</th>
+                    <th>Genre</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><input class="form-input form-input-sm" value="@item.Matricule" readonly /></td>
+                        <td><input class="form-input form-input-sm" value="@item.Cin" readonly /></td>
+                        <td><input class="form-input form-input-sm" value="@item.NomFr" readonly /></td>
+                        <td><input class="form-input form-input-sm" value="@item.PrenomFr" readonly /></td>
+                        <td><input class="form-input form-input-sm arabic-font" value="@item.NomAr" dir="rtl" readonly /></td>
+                        <td><input class="form-input form-input-sm arabic-font" value="@item.PrenomAr" dir="rtl" readonly /></td>
+                        <td><input class="form-input form-input-sm" value="@item.DateNaissance.ToString("yyyy-MM-dd")" readonly /></td>
+                        <td><input class="form-input form-input-sm" value="@item.DateRecrutement.ToString("yyyy-MM-dd")" readonly /></td>
+                        <td><input class="form-input form-input-sm" value="@(item.Genre == GestionIndemnite.Domain.RHOrganisation.Enums.Genre.Feminin ? "Féminin" : "Masculin")" readonly /></td>
+                        <td class="text-right"><a class="btn-table-action" asp-action="Edit" asp-route-id="@item.Id">Modifier</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

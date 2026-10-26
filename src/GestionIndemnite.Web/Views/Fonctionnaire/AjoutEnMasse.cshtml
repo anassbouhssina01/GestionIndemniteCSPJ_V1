@@ -1,0 +1,89 @@
+@{
+    ViewData["Title"] = "Ajouter des fonctionnaires en masse";
+    var genres = ViewBag.Genres as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+}
+
+<div class="page-header-row">
+    <div class="page-title-group">
+        <h2 class="page-title-serif">AJOUTER DES FONCTIONNAIRES EN MASSE</h2>
+        <p class="page-description">Remplissez le tableau ci-dessous pour ajouter plusieurs fonctionnaires à la fois.</p>
+    </div>
+    <div class="page-actions-group">
+        <button type="button" class="btn btn-outline" id="add-row">Ajouter une ligne</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Retour à la liste</a>
+    </div>
+</div>
+
+<form method="post" class="panel-card">
+    <div class="table-responsive">
+        <table class="data-table" id="bulk-table">
+            <thead>
+                <tr>
+                    <th>Matricule</th>
+                    <th>CIN</th>
+                    <th>Nom (français)</th>
+                    <th>Prénom (français)</th>
+                    <th>Nom (arabe)</th>
+                    <th>Prénom (arabe)</th>
+                    <th>Date de naissance</th>
+                    <th>Date de recrutement</th>
+                    <th>Genre</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input class="form-input form-input-sm" name="Matricule[0]" required /></td>
+                    <td><input class="form-input form-input-sm" name="Cin[0]" required /></td>
+                    <td><input class="form-input form-input-sm" name="NomFr[0]" required /></td>
+                    <td><input class="form-input form-input-sm" name="PrenomFr[0]" required /></td>
+                    <td><input class="form-input form-input-sm arabic-font" name="NomAr[0]" dir="rtl" /></td>
+                    <td><input class="form-input form-input-sm arabic-font" name="PrenomAr[0]" dir="rtl" /></td>
+                    <td><input class="form-input form-input-sm" type="date" name="DateNaissance[0]" required /></td>
+                    <td><input class="form-input form-input-sm" type="date" name="DateRecrutement[0]" required /></td>
+                    <td>
+                        <select class="form-select form-input-sm" name="Genre[0]">
+                            <option value="0">Masculin</option>
+                            <option value="1">Féminin</option>
+                        </select>
+                    </td>
+                    <td><button type="button" class="btn-table-action remove-row">Supprimer</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="page-actions-group mt-3">
+        <button type="submit" class="btn btn-primary">Enregistrer tout</button>
+        <a class="btn btn-outline-dark" asp-action="Index">Annuler</a>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    (function(){
+        var table = document.getElementById('bulk-table').getElementsByTagName('tbody')[0];
+        var addBtn = document.getElementById('add-row');
+        var index = 1;
+        addBtn.addEventListener('click', function(){
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td><input class="form-input form-input-sm" name="Matricule['+index+']" required /></td>'
+                + '<td><input class="form-input form-input-sm" name="Cin['+index+']" required /></td>'
+                + '<td><input class="form-input form-input-sm" name="NomFr['+index+']" required /></td>'
+                + '<td><input class="form-input form-input-sm" name="PrenomFr['+index+']" required /></td>'
+                + '<td><input class="form-input form-input-sm arabic-font" name="NomAr['+index+']" dir="rtl" /></td>'
+                + '<td><input class="form-input form-input-sm arabic-font" name="PrenomAr['+index+']" dir="rtl" /></td>'
+                + '<td><input class="form-input form-input-sm" type="date" name="DateNaissance['+index+']" required /></td>'
+                + '<td><input class="form-input form-input-sm" type="date" name="DateRecrutement['+index+']" required /></td>'
+                + '<td><select class="form-select form-input-sm" name="Genre['+index+']"><option value="0">Masculin</option><option value="1">Féminin</option></select></td>'
+                + '<td><button type="button" class="btn-table-action remove-row">Supprimer</button></td>';
+            table.appendChild(tr);
+            index++;
+        });
+        table.addEventListener('click', function(e){
+            if(e.target.classList.contains('remove-row')){
+                if(table.rows.length > 1) e.target.closest('tr').remove();
+            }
+        });
+    })();
+</script>
+}
