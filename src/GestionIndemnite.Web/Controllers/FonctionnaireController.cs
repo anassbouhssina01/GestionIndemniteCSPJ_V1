@@ -142,7 +142,8 @@ public class FonctionnaireController : Controller
         // Traitement en masse simple - à affiner selon les besoins
         var lignes = form.Keys
             .Where(k => k.StartsWith("Matricule["))
-            .Select(k => k.Substring("Matricule[".Length, k.Length - "Matricule[".Length - 1]))
+            .Select(k => k.Substring("Matricule[".Length))
+            .Select(k => k.Substring(0, k.Length - 1))
             .Distinct()
             .ToList();
 
